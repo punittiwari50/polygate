@@ -1,0 +1,21 @@
+packages:
+  - 'packages/*'
+
+nodeLinker: hoisted
+symlink: true
+storeDir: ./.pnpm-store
+cacheDir: ./.pnpm-cache
+lockfile: false
+sideEffectsCache: false
+confirmModulesPurge: false
+linkWorkspacePackages: true
+
+
+allowBuilds:
+  oracledb: true
+
+overrides:
+  glob: "^12.0.0"
+  inflight: "npm:lru-cache@^10.2.2"
+  js-yaml: "^4.1.0"
+

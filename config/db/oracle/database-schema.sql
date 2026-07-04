@@ -1,0 +1,571 @@
+-- =====================================================================
+-- POLYGATE — ORACLE CANONICAL RELATIONAL SCHEMA (DDL)
+-- =====================================================================
+-- Conventions:
+--   * Table prefix "PG_" to avoid collisions in shared schemas.
+--   * Surrogate identity primary keys using GENERATED ALWAYS AS IDENTITY.
+--   * CREATED_AT / UPDATED_AT on every table for auditability.
+--   * Secrets are stored as BLOB and are expected to be AES-256-GCM encrypted.
+--   * ALL tables, columns, constraints, and index names are in UPPERCASE.
+-- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- PG_APPLICATION_DOMAIN: Lookup for domain type / category
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_APPLICATION_DOMAIN (
+    DOMAIN_ID    NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    DOMAIN_CODE  VARCHAR2(32) NOT NULL,
+    DISPLAY_NAME VARCHAR2(128) NOT NULL,
+    CREATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT UQ_PG_DOMAIN_CODE UNIQUE (DOMAIN_CODE)
+);
+
+COMMENT ON TABLE  PG_APPLICATION_DOMAIN IS 'Lookup table for target application category types (e.g. HOTEL, AIRLINE, BROKER).';
+COMMENT ON COLUMN PG_APPLICATION_DOMAIN.DOMAIN_ID IS 'Surrogate identity primary key for the domain category.';
+COMMENT ON COLUMN PG_APPLICATION_DOMAIN.DOMAIN_CODE IS 'Unique short code identifying the domain category.';
+COMMENT ON COLUMN PG_APPLICATION_DOMAIN.DISPLAY_NAME IS 'Human-readable display name of the domain category.';
+COMMENT ON COLUMN PG_APPLICATION_DOMAIN.CREATED_AT IS 'Timestamp when the domain category was created.';
+COMMENT ON COLUMN PG_APPLICATION_DOMAIN.UPDATED_AT IS 'Timestamp when the domain category was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_APP_DOM_UPD
+BEFORE UPDATE ON PG_APPLICATION_DOMAIN
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_ENDPOINT_PURPOSE: Lookup for endpoint purpose / operation type
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_ENDPOINT_PURPOSE (
+    PURPOSE_ID   NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    PURPOSE_CODE VARCHAR2(32) NOT NULL,
+    DISPLAY_NAME VARCHAR2(128) NOT NULL,
+    CREATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT UQ_PG_PURPOSE_CODE UNIQUE (PURPOSE_CODE)
+);
+
+COMMENT ON TABLE  PG_ENDPOINT_PURPOSE IS 'Lookup table for target endpoint purposes (e.g. LOGIN, LOGOUT, VERIFY, CREATE, READ, UPDATE, DELETE, LIST).';
+COMMENT ON COLUMN PG_ENDPOINT_PURPOSE.PURPOSE_ID IS 'Surrogate identity primary key for the endpoint purpose.';
+COMMENT ON COLUMN PG_ENDPOINT_PURPOSE.PURPOSE_CODE IS 'Unique short code identifying the endpoint purpose.';
+COMMENT ON COLUMN PG_ENDPOINT_PURPOSE.DISPLAY_NAME IS 'Human-readable display name of the endpoint purpose.';
+COMMENT ON COLUMN PG_ENDPOINT_PURPOSE.CREATED_AT IS 'Timestamp when the endpoint purpose was created.';
+COMMENT ON COLUMN PG_ENDPOINT_PURPOSE.UPDATED_AT IS 'Timestamp when the endpoint purpose was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_END_PURP_UPD
+BEFORE UPDATE ON PG_ENDPOINT_PURPOSE
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_AUDIT_ACTION: Lookup for auditable actions
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_AUDIT_ACTION (
+    ACTION_ID    NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ACTION_CODE  VARCHAR2(32) NOT NULL,
+    DISPLAY_NAME VARCHAR2(128) NOT NULL,
+    CREATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT UQ_PG_ACTION_CODE UNIQUE (ACTION_CODE)
+);
+
+COMMENT ON TABLE  PG_AUDIT_ACTION IS 'Lookup table for auditable actions performed (e.g. LOGIN, LOGOUT, VERIFY, PROXY, SEED, ORDER_CREATE, ORDER_READ, ORDER_UPDATE, ORDER_DELETE, ORDER_LIST).';
+COMMENT ON COLUMN PG_AUDIT_ACTION.ACTION_ID IS 'Surrogate identity primary key for the audit action.';
+COMMENT ON COLUMN PG_AUDIT_ACTION.ACTION_CODE IS 'Unique short code identifying the audit action.';
+COMMENT ON COLUMN PG_AUDIT_ACTION.DISPLAY_NAME IS 'Human-readable display name of the audit action.';
+COMMENT ON COLUMN PG_AUDIT_ACTION.CREATED_AT IS 'Timestamp when the audit action was created.';
+COMMENT ON COLUMN PG_AUDIT_ACTION.UPDATED_AT IS 'Timestamp when the audit action was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_AUD_ACT_UPD
+BEFORE UPDATE ON PG_AUDIT_ACTION
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_PERSON: Represents physical users owning identities
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_PERSON (
+    PERSON_ID    NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    DISPLAY_NAME VARCHAR2(128) NOT NULL,
+    EMAIL        VARCHAR2(256) NOT NULL,
+    STATUS       VARCHAR2(16) DEFAULT 'ACTIVE' NOT NULL,
+    CREATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT UQ_PG_PERSON_EMAIL UNIQUE (EMAIL),
+    CONSTRAINT CK_PG_PERSON_STATUS CHECK (STATUS IN ('ACTIVE', 'SUSPENDED', 'DELETED'))
+);
+
+COMMENT ON TABLE  PG_PERSON IS 'Represents a real person/user owning one or more access identities across applications.';
+COMMENT ON COLUMN PG_PERSON.PERSON_ID IS 'Surrogate identity primary key for the person.';
+COMMENT ON COLUMN PG_PERSON.DISPLAY_NAME IS 'Human-readable display name of the person.';
+COMMENT ON COLUMN PG_PERSON.EMAIL IS 'Unique email address of the person.';
+COMMENT ON COLUMN PG_PERSON.STATUS IS 'Lifecycle state of the person profile (ACTIVE, SUSPENDED, DELETED).';
+COMMENT ON COLUMN PG_PERSON.CREATED_AT IS 'Timestamp when the person record was created.';
+COMMENT ON COLUMN PG_PERSON.UPDATED_AT IS 'Timestamp when the person record was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_PERSON_UPD
+BEFORE UPDATE ON PG_PERSON
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_APPLICATION: Main application registry referencing domain type
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_APPLICATION (
+    APP_ID       NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    APP_KEY      VARCHAR2(64) NOT NULL,
+    DISPLAY_NAME VARCHAR2(128) NOT NULL,
+    DOMAIN_ID    NUMBER(19) NOT NULL,
+    AUTH_TYPE    VARCHAR2(32) NOT NULL,
+    STATUS       VARCHAR2(16) DEFAULT 'ACTIVE' NOT NULL,
+    CREATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT   TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT UQ_PG_APP_KEY UNIQUE (APP_KEY),
+    CONSTRAINT FK_PG_APP_DOMAIN FOREIGN KEY (DOMAIN_ID) REFERENCES PG_APPLICATION_DOMAIN(DOMAIN_ID),
+    CONSTRAINT CK_PG_APP_AUTH_TYPE CHECK (AUTH_TYPE IN ('OAUTH', 'BASIC', 'API_KEY', 'NONE')),
+    CONSTRAINT CK_PG_APP_STATUS CHECK (STATUS IN ('ACTIVE', 'DISABLED'))
+);
+
+COMMENT ON TABLE  PG_APPLICATION IS 'Registered downstream target applications grouped by domain category.';
+COMMENT ON COLUMN PG_APPLICATION.APP_ID IS 'Surrogate identity primary key for the application.';
+COMMENT ON COLUMN PG_APPLICATION.APP_KEY IS 'Short identifier used in routes, e.g. /apps/copilot';
+COMMENT ON COLUMN PG_APPLICATION.DISPLAY_NAME IS 'Human-readable name of the application.';
+COMMENT ON COLUMN PG_APPLICATION.DOMAIN_ID IS 'Foreign key reference to PG_APPLICATION_DOMAIN.';
+COMMENT ON COLUMN PG_APPLICATION.AUTH_TYPE IS 'Authentication mechanism category (OAUTH, BASIC, API_KEY, NONE).';
+COMMENT ON COLUMN PG_APPLICATION.STATUS IS 'Operational status of the application mapping (ACTIVE, DISABLED).';
+COMMENT ON COLUMN PG_APPLICATION.CREATED_AT IS 'Timestamp when the application record was created.';
+COMMENT ON COLUMN PG_APPLICATION.UPDATED_AT IS 'Timestamp when the application record was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_APPLICATION_UPD
+BEFORE UPDATE ON PG_APPLICATION
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_APPLICATION_SUBSCRIPTION: Subscription/plan tiers
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_APPLICATION_SUBSCRIPTION (
+    SUBSCRIPTION_ID NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    APP_ID          NUMBER(19) NOT NULL,
+    PLAN_NAME       VARCHAR2(64) NOT NULL,
+    STATUS          VARCHAR2(16) DEFAULT 'ACTIVE' NOT NULL,
+    START_DATE      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    END_DATE        TIMESTAMP,
+    RATE_LIMIT_RPS  NUMBER(10) DEFAULT 0 NOT NULL,
+    CREATED_AT      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_SUB_APP FOREIGN KEY (APP_ID) REFERENCES PG_APPLICATION(APP_ID) ON DELETE CASCADE,
+    CONSTRAINT CK_PG_SUB_STATUS CHECK (STATUS IN ('ACTIVE', 'EXPIRED', 'SUSPENDED'))
+);
+
+COMMENT ON TABLE  PG_APPLICATION_SUBSCRIPTION IS 'Subscription plan metadata affecting access rights and rate limits per application.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.SUBSCRIPTION_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.APP_ID IS 'Foreign key reference to PG_APPLICATION.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.PLAN_NAME IS 'Subscription tier name (e.g., GOLD, SILVER, PLATINUM).';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.STATUS IS 'Operational subscription status (ACTIVE, EXPIRED, SUSPENDED).';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.START_DATE IS 'Activation timestamp of the subscription tier.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.END_DATE IS 'Expiry timestamp of the subscription tier (nullable if perpetual).';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.RATE_LIMIT_RPS IS 'Enforced requests-per-second rate limit for the subscription.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.CREATED_AT IS 'Timestamp when the subscription was recorded.';
+COMMENT ON COLUMN PG_APPLICATION_SUBSCRIPTION.UPDATED_AT IS 'Timestamp when the subscription record was updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_APP_SUB_UPD
+BEFORE UPDATE ON PG_APPLICATION_SUBSCRIPTION
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_APP_ACCESS_CHANNEL: Multi-audience endpoint access channels
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_APP_ACCESS_CHANNEL (
+    CHANNEL_ID                NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    APP_ID                    NUMBER(19) NOT NULL,
+    CHANNEL_TYPE              VARCHAR2(32) NOT NULL,
+    BASE_URL                  VARCHAR2(512) NOT NULL,
+    LOGIN_URL                 VARCHAR2(512),
+    LOGOUT_URL                VARCHAR2(512),
+    LOGIN_SUCCESS_URL_PATTERN VARCHAR2(256),
+    LOGIN_SUCCESS_COOKIE_NAME VARCHAR2(256),
+    SESSION_INJECTION_RULES   CLOB, -- TODO: migrate to native JSON in Oracle 23c+
+    USER_ID_COOKIE_NAME       VARCHAR2(128),
+    CREATED_AT                TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT                TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_CHANNEL_APP FOREIGN KEY (APP_ID) REFERENCES PG_APPLICATION(APP_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_APP_CHANNEL UNIQUE (APP_ID, CHANNEL_TYPE),
+    CONSTRAINT CK_PG_CHANNEL_TYPE CHECK (CHANNEL_TYPE IN ('CUSTOMER', 'BROKER', 'PARTNER', 'INTERNAL'))
+);
+
+COMMENT ON TABLE  PG_APP_ACCESS_CHANNEL IS 'Distinct entry points, URLs, and browser capture configuration for an application per target audience.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.CHANNEL_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.APP_ID IS 'Foreign key reference to PG_APPLICATION.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.CHANNEL_TYPE IS 'Target audience category (CUSTOMER, BROKER, PARTNER, INTERNAL).';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.BASE_URL IS 'Upstream destination base URL of the channel.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.LOGIN_URL IS 'Upstream login landing page for this channel.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.LOGOUT_URL IS 'Upstream logout landing page for this channel.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.LOGIN_SUCCESS_URL_PATTERN IS 'Regex pattern matched against browser URLs to signal a successful login capture.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.LOGIN_SUCCESS_COOKIE_NAME IS 'The cookie name that indicates authenticated session readiness.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.SESSION_INJECTION_RULES IS 'JSON structure containing cookie/header injection rules during proxying.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.USER_ID_COOKIE_NAME IS 'Cookie used to extract the user identifier for tenancy logic.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.CREATED_AT IS 'Timestamp when the channel was created.';
+COMMENT ON COLUMN PG_APP_ACCESS_CHANNEL.UPDATED_AT IS 'Timestamp when the channel was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_APP_ACC_CHN_UPD
+BEFORE UPDATE ON PG_APP_ACCESS_CHANNEL
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_APPLICATION_VERSION: Subscription/channel API versioning
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_APPLICATION_VERSION (
+    VERSION_ID     NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    CHANNEL_ID     NUMBER(19) NOT NULL,
+    VERSION_LABEL  VARCHAR2(32) NOT NULL,
+    EFFECTIVE_FROM TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    EFFECTIVE_TO   TIMESTAMP,
+    IS_CURRENT     NUMBER(1) DEFAULT 1 NOT NULL,
+    CREATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_VER_CHANNEL FOREIGN KEY (CHANNEL_ID) REFERENCES PG_APP_ACCESS_CHANNEL(CHANNEL_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_CHANNEL_VERSION UNIQUE (CHANNEL_ID, VERSION_LABEL),
+    CONSTRAINT CK_PG_VER_CURRENT CHECK (IS_CURRENT IN (0, 1)),
+    CONSTRAINT CK_PG_VERSION_EFF CHECK (EFFECTIVE_TO IS NULL OR EFFECTIVE_TO > EFFECTIVE_FROM)
+);
+
+COMMENT ON TABLE  PG_APPLICATION_VERSION IS 'Version lifecycle tracking for API definitions per application channel.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.VERSION_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.CHANNEL_ID IS 'Foreign key reference to PG_APP_ACCESS_CHANNEL.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.VERSION_LABEL IS 'Human friendly label of the version (e.g. v1, v2.1).';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.EFFECTIVE_FROM IS 'Activation timestamp of the version.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.EFFECTIVE_TO IS 'Deactivation timestamp of the version (nullable if active).';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.IS_CURRENT IS 'Flag indicating whether this version is the current active channel definition.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.CREATED_AT IS 'Timestamp when the version record was created.';
+COMMENT ON COLUMN PG_APPLICATION_VERSION.UPDATED_AT IS 'Timestamp when the version record was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_APP_VER_UPD
+BEFORE UPDATE ON PG_APPLICATION_VERSION
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- Function-based index ensuring at most one current version per channel in Oracle
+CREATE UNIQUE INDEX IDX_UQ_VER_CURRENT_CHANNEL ON PG_APPLICATION_VERSION (CASE WHEN IS_CURRENT = 1 THEN CHANNEL_ID ELSE NULL END);
+
+-- ---------------------------------------------------------------------
+-- PG_USER_IDENTITY: Login identity for a person per application
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_USER_IDENTITY (
+    IDENTITY_ID      NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    PERSON_ID        NUMBER(19) NOT NULL,
+    APP_ID           NUMBER(19) NOT NULL,
+    USER_ID          VARCHAR2(128) NOT NULL,
+    AUTH_CREDENTIALS BLOB,
+    KEY_VERSION      NUMBER(5) NOT NULL,
+    CREATED_AT       TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT       TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    -- CASCADE FK REVIEW: ON DELETE CASCADE is intentional to fully clear identities on application delete.
+    CONSTRAINT FK_PG_IDENT_PERSON FOREIGN KEY (PERSON_ID) REFERENCES PG_PERSON(PERSON_ID) ON DELETE CASCADE,
+    CONSTRAINT FK_PG_IDENT_APP FOREIGN KEY (APP_ID) REFERENCES PG_APPLICATION(APP_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_APP_USER UNIQUE (APP_ID, USER_ID)
+);
+
+COMMENT ON TABLE  PG_USER_IDENTITY IS 'Unique credentials and identities held by a person on a specific application.';
+COMMENT ON COLUMN PG_USER_IDENTITY.IDENTITY_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_USER_IDENTITY.PERSON_ID IS 'Foreign key reference to PG_PERSON (the owner).';
+COMMENT ON COLUMN PG_USER_IDENTITY.APP_ID IS 'Foreign key reference to PG_APPLICATION.';
+COMMENT ON COLUMN PG_USER_IDENTITY.USER_ID IS 'Login username/identifier specific to the application.';
+COMMENT ON COLUMN PG_USER_IDENTITY.AUTH_CREDENTIALS IS 'AES-256-GCM encrypted binary payload containing OAuth tokens or credentials.';
+COMMENT ON COLUMN PG_USER_IDENTITY.KEY_VERSION IS 'Encryption key version used to decrypt credentials, enabling key rotation.';
+COMMENT ON COLUMN PG_USER_IDENTITY.CREATED_AT IS 'Timestamp when this user identity was created.';
+COMMENT ON COLUMN PG_USER_IDENTITY.UPDATED_AT IS 'Timestamp when this user identity was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_USR_IDENT_UPD
+BEFORE UPDATE ON PG_USER_IDENTITY
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_SESSION_CREDENTIAL: Captured sessions per identity
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_SESSION_CREDENTIAL (
+    SESSION_ID     NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    IDENTITY_ID    NUMBER(19) NOT NULL,
+    COOKIE_PAYLOAD BLOB NOT NULL,
+    HEADER_PAYLOAD BLOB NOT NULL,
+    KEY_VERSION    NUMBER(5) NOT NULL,
+    SESSION_UUID   VARCHAR2(36) NOT NULL,
+    CAPTURED_AT    TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    EXPIRES_AT     TIMESTAMP,
+    IS_ACTIVE      NUMBER(1) DEFAULT 1 NOT NULL,
+    CREATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    -- CASCADE FK REVIEW: ON DELETE CASCADE is intentional to clear sessions when user identity is removed.
+    CONSTRAINT FK_PG_SESSION_IDENTITY FOREIGN KEY (IDENTITY_ID) REFERENCES PG_USER_IDENTITY(IDENTITY_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_SESSION_UUID UNIQUE (SESSION_UUID),
+    CONSTRAINT CK_PG_SESSION_ACTIVE CHECK (IS_ACTIVE IN (0, 1)),
+    CONSTRAINT CK_PG_SESSION_EXP CHECK (EXPIRES_AT IS NULL OR EXPIRES_AT > CAPTURED_AT)
+);
+
+COMMENT ON TABLE  PG_SESSION_CREDENTIAL IS 'Encrypted session tokens/cookies captured for a specific application identity.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.SESSION_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.IDENTITY_ID IS 'Foreign key reference to PG_USER_IDENTITY.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.COOKIE_PAYLOAD IS 'AES-256-GCM encrypted, serialized cookie jar binary payload.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.HEADER_PAYLOAD IS 'AES-256-GCM encrypted, serialized header map binary payload.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.KEY_VERSION IS 'Encryption key version used to decrypt cookies and headers, enabling key rotation.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.SESSION_UUID IS 'Unique session lookup identifier exposed to clients.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.CAPTURED_AT IS 'Timestamp when the credentials were captured.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.EXPIRES_AT IS 'Optional expiration timestamp of the session credentials.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.IS_ACTIVE IS 'Binary indicator representing session validity state.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.CREATED_AT IS 'Timestamp when the record was created.';
+COMMENT ON COLUMN PG_SESSION_CREDENTIAL.UPDATED_AT IS 'Timestamp when the record was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_SESS_CRED_UPD
+BEFORE UPDATE ON PG_SESSION_CREDENTIAL
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_ENDPOINT_DEFINITION: Endpoint definition supporting HTTP or WS
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_ENDPOINT_DEFINITION (
+    ENDPOINT_ID          NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    VERSION_ID           NUMBER(19) NOT NULL,
+    NAME                 VARCHAR2(128) NOT NULL,
+    PURPOSE_ID           NUMBER(19) NOT NULL,
+    PROTOCOL_TYPE        VARCHAR2(16) NOT NULL,
+    PATH                 VARCHAR2(512),
+    HTTP_METHOD          VARCHAR2(8),
+    WS_URL_PATH          VARCHAR2(512),
+    WS_SUBPROTOCOL       VARCHAR2(128),
+    WS_MESSAGE_SCHEMA    CLOB, -- TODO: migrate to native JSON in Oracle 23c+
+    REQUIRES_AUTH        NUMBER(1) DEFAULT 1 NOT NULL,
+    REQUEST_HEADERS      CLOB,
+    REQUEST_BODY_SCHEMA  CLOB, -- TODO: migrate to native JSON in Oracle 23c+
+    RESPONSE_BODY_SCHEMA CLOB, -- TODO: migrate to native JSON in Oracle 23c+
+    SAMPLE_RESPONSE      CLOB,
+    DESCRIPTION          VARCHAR2(1024),
+    CREATED_AT           TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT           TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_ENDPOINT_VERSION FOREIGN KEY (VERSION_ID) REFERENCES PG_APPLICATION_VERSION(VERSION_ID) ON DELETE CASCADE,
+    CONSTRAINT FK_PG_ENDPOINT_PURPOSE FOREIGN KEY (PURPOSE_ID) REFERENCES PG_ENDPOINT_PURPOSE(PURPOSE_ID),
+    CONSTRAINT UQ_PG_VERSION_ENDPOINT UNIQUE (VERSION_ID, NAME),
+    CONSTRAINT CK_PG_ENDPOINT_PROTOCOL CHECK (PROTOCOL_TYPE IN ('HTTP', 'WEBSOCKET')),
+    CONSTRAINT CK_PG_ENDPOINT_METHOD CHECK (HTTP_METHOD IN ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')),
+    CONSTRAINT CK_PG_ENDPOINT_AUTH CHECK (REQUIRES_AUTH IN (0, 1)),
+    CONSTRAINT CK_PG_ENDPOINT_PROTO_CON CHECK (
+        (PROTOCOL_TYPE = 'HTTP' AND PATH IS NOT NULL AND HTTP_METHOD IS NOT NULL) OR
+        (PROTOCOL_TYPE = 'WEBSOCKET' AND WS_URL_PATH IS NOT NULL)
+    )
+);
+
+COMMENT ON TABLE  PG_ENDPOINT_DEFINITION IS 'Registered application endpoints, supporting either HTTP or WebSocket protocol, mapped to version constraints.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.ENDPOINT_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.VERSION_ID IS 'Foreign key reference to PG_APPLICATION_VERSION.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.NAME IS 'Unique developer friendly endpoint name.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.PURPOSE_ID IS 'Foreign key reference to PG_ENDPOINT_PURPOSE.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.PROTOCOL_TYPE IS 'Operational network protocol (HTTP, WEBSOCKET).';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.PATH IS 'Path route suffix of the endpoint (HTTP-only).';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.HTTP_METHOD IS 'HTTP verb required (HTTP-only).';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.WS_URL_PATH IS 'WebSocket connection URL path route.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.WS_SUBPROTOCOL IS 'WebSocket connection subprotocol requirements (nullable).';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.WS_MESSAGE_SCHEMA IS 'WebSocket payload frame JSON schemas.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.REQUIRES_AUTH IS 'Binary flag indicating if proxy routing requires injecting session credentials.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.REQUEST_HEADERS IS 'Serialized JSON list of expected request headers.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.REQUEST_BODY_SCHEMA IS 'JSON Schema describing the request body structure.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.RESPONSE_BODY_SCHEMA IS 'JSON Schema describing the response body structure.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.SAMPLE_RESPONSE IS 'JSON string representing a typical successful response body.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.DESCRIPTION IS 'Documentation summary detailing parameter meanings.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.CREATED_AT IS 'Timestamp when the endpoint was created.';
+COMMENT ON COLUMN PG_ENDPOINT_DEFINITION.UPDATED_AT IS 'Timestamp when the endpoint was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_END_DEF_UPD
+BEFORE UPDATE ON PG_ENDPOINT_DEFINITION
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_ENDPOINT_RESPONSE_STATUS: Available response codes per endpoint (Oracle)
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_ENDPOINT_RESPONSE_STATUS (
+    STATUS_ID   NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ENDPOINT_ID NUMBER(19) NOT NULL,
+    STATUS_CODE NUMBER(5) NOT NULL,
+    MEANING     VARCHAR2(256) NOT NULL,
+    IS_SUCCESS  NUMBER(1) DEFAULT 1 NOT NULL,
+    CREATED_AT  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT  TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_STATUS_ENDPOINT FOREIGN KEY (ENDPOINT_ID) REFERENCES PG_ENDPOINT_DEFINITION(ENDPOINT_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_ENDPOINT_STATUS UNIQUE (ENDPOINT_ID, STATUS_CODE),
+    CONSTRAINT CK_PG_STATUS_SUCCESS CHECK (IS_SUCCESS IN (0, 1))
+);
+
+COMMENT ON TABLE  PG_ENDPOINT_RESPONSE_STATUS IS 'Mapping of HTTP status responses and their success classification per endpoint.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.STATUS_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.ENDPOINT_ID IS 'Foreign key reference to PG_ENDPOINT_DEFINITION.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.STATUS_CODE IS 'The HTTP status code (e.g. 200, 201, 400).';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.MEANING IS 'Description of what this status code implies.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.IS_SUCCESS IS 'Binary flag classifying whether this code indicates success.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.CREATED_AT  IS 'Timestamp when the status mapping was created.';
+COMMENT ON COLUMN PG_ENDPOINT_RESPONSE_STATUS.UPDATED_AT  IS 'Timestamp when the status mapping was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_END_RESP_STAT_UPD
+BEFORE UPDATE ON PG_ENDPOINT_RESPONSE_STATUS
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_ENDPOINT_PARAMETER: Validation, static and dynamic parameter routing (Oracle)
+-- ---------------------------------------------------------------------
+CREATE TABLE PG_ENDPOINT_PARAMETER (
+    PARAMETER_ID         NUMBER(19) GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ENDPOINT_ID          NUMBER(19) NOT NULL,
+    PARAM_NAME           VARCHAR2(128) NOT NULL,
+    LOCATION             VARCHAR2(32) NOT NULL,
+    DATA_TYPE            VARCHAR2(32) NOT NULL,
+    IS_REQUIRED          NUMBER(1) DEFAULT 1 NOT NULL,
+    DEFAULT_STATIC_VALUE CLOB,
+    IS_DYNAMIC           NUMBER(1) DEFAULT 1 NOT NULL,
+    IS_INTERNAL_ONLY     NUMBER(1) DEFAULT 0 NOT NULL,
+    CREATED_AT           TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT           TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CONSTRAINT FK_PG_PARAM_ENDPOINT FOREIGN KEY (ENDPOINT_ID) REFERENCES PG_ENDPOINT_DEFINITION(ENDPOINT_ID) ON DELETE CASCADE,
+    CONSTRAINT UQ_PG_ENDPOINT_PARAM UNIQUE (ENDPOINT_ID, PARAM_NAME, LOCATION),
+    CONSTRAINT CK_PG_PARAM_LOCATION CHECK (LOCATION IN ('PATH', 'QUERY', 'HEADER', 'BODY')),
+    CONSTRAINT CK_PG_PARAM_REQUIRED CHECK (IS_REQUIRED IN (0, 1)),
+    CONSTRAINT CK_PG_PARAM_DYNAMIC CHECK (IS_DYNAMIC IN (0, 1)),
+    CONSTRAINT CK_PG_PARAM_INTERNAL CHECK (IS_INTERNAL_ONLY IN (0, 1))
+);
+
+COMMENT ON TABLE  PG_ENDPOINT_PARAMETER IS 'Structured parameter details driving proxy parsing and downstream request formatting.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.PARAMETER_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.ENDPOINT_ID IS 'Foreign key reference to PG_ENDPOINT_DEFINITION.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.PARAM_NAME IS 'The name of the parameter.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.LOCATION IS 'Where the parameter resides (PATH, QUERY, HEADER, BODY).';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.DATA_TYPE IS 'Data type validation format (e.g. string, integer, boolean).';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.IS_REQUIRED IS 'Binary flag (0/1) indicating if the parameter is mandatory.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.DEFAULT_STATIC_VALUE IS 'Fallback value used when not supplied, or the fixed value when static.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.IS_DYNAMIC IS 'Binary flag: 1 implies caller provides it at runtime, 0 means static value stored in schema.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.IS_INTERNAL_ONLY IS 'Flag (0/1) indicating that the parameter is for Polygate internal use only. If a parameter is static (IS_DYNAMIC = 0) and internal-only (IS_INTERNAL_ONLY = 1), proxy implementation must redact/strip it from outbound requests forwarded downstream (e.g. internal routing tags, tenant tracking tags, or Polygate-only correlation IDs).';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.CREATED_AT IS 'Timestamp when the parameter was created.';
+COMMENT ON COLUMN PG_ENDPOINT_PARAMETER.UPDATED_AT IS 'Timestamp when the parameter was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_END_PARAM_UPD
+BEFORE UPDATE ON PG_ENDPOINT_PARAMETER
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- PG_AUDIT_LOG: Audit trailing and multi-tier transaction tracing (Oracle)
+-- ---------------------------------------------------------------------
+-- Partitioning Rationale:
+-- Range partitioning by monthly intervals on EXECUTED_AT allows efficient log rotation,
+-- fast bulk deletion of expired logs (by dropping partitions instead of running heavy DELETEs),
+-- and localized index lookups. Oracle interval partitioning automatically creates monthly partitions.
+CREATE TABLE PG_AUDIT_LOG (
+    LOG_ID         NUMBER(19) GENERATED ALWAYS AS IDENTITY,
+    APP_ID         NUMBER(19),
+    ENDPOINT_ID    NUMBER(19),
+    PERSON_ID      NUMBER(19),
+    IDENTITY_ID    NUMBER(19),
+    SESSION_ID     NUMBER(19),
+    ACTION_ID      NUMBER(19) NOT NULL,
+    STATUS_CODE    NUMBER(5),
+    CORRELATION_ID VARCHAR2(64),
+    DETAIL         CLOB,
+    EXECUTED_AT    TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    CREATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    UPDATED_AT     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    PRIMARY KEY (LOG_ID, EXECUTED_AT),
+    CONSTRAINT FK_PG_AUDIT_APP FOREIGN KEY (APP_ID) REFERENCES PG_APPLICATION(APP_ID) ON DELETE SET NULL,
+    CONSTRAINT FK_PG_AUDIT_ENDPOINT FOREIGN KEY (ENDPOINT_ID) REFERENCES PG_ENDPOINT_DEFINITION(ENDPOINT_ID) ON DELETE SET NULL,
+    CONSTRAINT FK_PG_AUDIT_PERSON FOREIGN KEY (PERSON_ID) REFERENCES PG_PERSON(PERSON_ID) ON DELETE SET NULL,
+    CONSTRAINT FK_PG_AUDIT_IDENTITY FOREIGN KEY (IDENTITY_ID) REFERENCES PG_USER_IDENTITY(IDENTITY_ID) ON DELETE SET NULL,
+    CONSTRAINT FK_PG_AUDIT_SESSION FOREIGN KEY (SESSION_ID) REFERENCES PG_SESSION_CREDENTIAL(SESSION_ID) ON DELETE SET NULL,
+    CONSTRAINT FK_PG_AUDIT_ACTION FOREIGN KEY (ACTION_ID) REFERENCES PG_AUDIT_ACTION(ACTION_ID)
+) PARTITION BY RANGE (EXECUTED_AT) INTERVAL (NUMTOYMINTERVAL(1, 'MONTH')) (
+    PARTITION P_START VALUES LESS THAN (TIMESTAMP '2026-07-01 00:00:00')
+);
+
+COMMENT ON TABLE  PG_AUDIT_LOG IS 'Traceability log recording operations, requests, response states, and correlations within the gateway.';
+COMMENT ON COLUMN PG_AUDIT_LOG.LOG_ID IS 'Surrogate identity primary key.';
+COMMENT ON COLUMN PG_AUDIT_LOG.APP_ID IS 'Optional foreign key reference to related application.';
+COMMENT ON COLUMN PG_AUDIT_LOG.ENDPOINT_ID IS 'Optional foreign key reference to related endpoint definition.';
+COMMENT ON COLUMN PG_AUDIT_LOG.PERSON_ID IS 'Optional foreign key reference to the related physical person.';
+COMMENT ON COLUMN PG_AUDIT_LOG.IDENTITY_ID IS 'Optional foreign key reference to the related login identity used.';
+COMMENT ON COLUMN PG_AUDIT_LOG.SESSION_ID IS 'Optional foreign key reference to the active session captured/used.';
+COMMENT ON COLUMN PG_AUDIT_LOG.ACTION_ID IS 'Foreign key reference to PG_AUDIT_ACTION lookup table.';
+COMMENT ON COLUMN PG_AUDIT_LOG.STATUS_CODE IS 'HTTP status code or execution result code of the action.';
+COMMENT ON COLUMN PG_AUDIT_LOG.CORRELATION_ID IS 'Trace ID/Correlation ID grouping multiple requests/responses into one execution stream.';
+COMMENT ON COLUMN PG_AUDIT_LOG.DETAIL IS 'Supplemental execution detail logs or JSON messages (redacted).';
+COMMENT ON COLUMN PG_AUDIT_LOG.EXECUTED_AT IS 'Timestamp when the action occurred.';
+COMMENT ON COLUMN PG_AUDIT_LOG.CREATED_AT IS 'Timestamp when the log record was created.';
+COMMENT ON COLUMN PG_AUDIT_LOG.UPDATED_AT IS 'Timestamp when the log record was last updated.';
+
+CREATE OR REPLACE TRIGGER TRG_PG_AUDIT_LOG_UPD
+BEFORE UPDATE ON PG_AUDIT_LOG
+FOR EACH ROW
+BEGIN
+    :NEW.UPDATED_AT := SYSTIMESTAMP;
+END;
+/
+
+-- ---------------------------------------------------------------------
+-- ORACLE INDEXES
+-- ---------------------------------------------------------------------
+CREATE INDEX IDX_PG_APP_DOMAIN ON PG_APPLICATION(DOMAIN_ID);
+CREATE INDEX IDX_PG_SUB_APP ON PG_APPLICATION_SUBSCRIPTION(APP_ID);
+CREATE INDEX IDX_PG_CHANNEL_APP ON PG_APP_ACCESS_CHANNEL(APP_ID);
+CREATE INDEX IDX_PG_VER_CHANNEL ON PG_APPLICATION_VERSION(CHANNEL_ID);
+CREATE INDEX IDX_PG_IDENT_PERSON ON PG_USER_IDENTITY(PERSON_ID);
+CREATE INDEX IDX_PG_IDENT_APP ON PG_USER_IDENTITY(APP_ID);
+CREATE INDEX IDX_PG_SESSION_IDENTITY ON PG_SESSION_CREDENTIAL(IDENTITY_ID);
+CREATE INDEX IDX_PG_ENDPOINT_VERSION ON PG_ENDPOINT_DEFINITION(VERSION_ID);
+CREATE INDEX IDX_PG_ENDPOINT_PURPOSE ON PG_ENDPOINT_DEFINITION(PURPOSE_ID);
+CREATE INDEX IDX_PG_STATUS_ENDPOINT ON PG_ENDPOINT_RESPONSE_STATUS(ENDPOINT_ID);
+CREATE INDEX IDX_PG_PARAM_ENDPOINT ON PG_ENDPOINT_PARAMETER(ENDPOINT_ID);
+
+-- Performance & Lookup Indexes (Requirement 5)
+CREATE INDEX IDX_PG_PERSON_IDENTITY ON PG_USER_IDENTITY(PERSON_ID, APP_ID);
+CREATE INDEX IDX_PG_IDENTITY_SESSION ON PG_SESSION_CREDENTIAL(IDENTITY_ID, IS_ACTIVE);
+CREATE INDEX IDX_PG_AUDIT_CORRELATION ON PG_AUDIT_LOG(CORRELATION_ID);
+CREATE INDEX IDX_PG_AUDIT_EXECUTED ON PG_AUDIT_LOG(EXECUTED_AT);
+CREATE INDEX IDX_PG_AUDIT_PERSON ON PG_AUDIT_LOG(PERSON_ID);
+CREATE INDEX IDX_PG_AUDIT_IDENTITY ON PG_AUDIT_LOG(IDENTITY_ID);

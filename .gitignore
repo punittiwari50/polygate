@@ -127,6 +127,8 @@ dist
 
 # pnpm
 .pnpm-store
+.pnpm-cache
+pnpm-store
 
 # yarn v3
 .pnp.*
@@ -141,3 +143,28 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Credentials, secrets, and private keys
+*secret*
+*credential*
+*.key
+*.pem
+*.pfx
+*.p12
+*.cer
+*.crt
+*.pub
+*.passwd
+*.password
+*credentials*.json
+*credentials*.yaml
+*credentials*.yml
+*secrets*.json
+*secrets*.yaml
+*secrets*.yml
+local-config.yaml
+local-config.yml
+config/secrets/
+session-store/
+sessions.json
+

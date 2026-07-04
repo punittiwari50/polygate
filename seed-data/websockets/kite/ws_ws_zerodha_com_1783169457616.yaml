@@ -1,0 +1,6 @@
+websocket:
+  appKey: kite
+  name: ws_ws_zerodha_com_1783169457616
+  path: >-
+    wss://ws.zerodha.com/?api_key={api_key}&user_id={user_id}&enctoken={enctoken}&uid={uid}&user-agent=kite3-web&version=3.0.0
+  description: Captured WebSocket connection to ws.zerodha.com

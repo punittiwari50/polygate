@@ -1,0 +1,52 @@
+{
+  "name": "polygate-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unified Authenticated Application Gateway Platform",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "sync-deps": "node scripts/sync-deps.js",
+    "sync-deps:check": "node scripts/sync-deps.js --check",
+    "typecheck": "tsc --build",
+    "build": "tsc --build && pnpm exec tsc-alias -p packages/core/tsconfig.json && pnpm exec tsc-alias -p packages/cli/tsconfig.json && pnpm exec tsc-alias -p packages/gateway-server/tsconfig.json && pnpm exec tsc-alias -p packages/persistence/tsconfig.json",
+    "clean": "tsc --build --clean && node scripts/clean-all.js",
+    "test": "jest",
+    "lint": "eslint \"packages/*/src/**/*.ts\""
+  },
+  "dependencyManagement": {
+    "typescript": "^5.4.5",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0",
+    "zod": "^3.23.8",
+    "express": "^4.19.2",
+    "@types/express": "^4.17.21",
+    "pino": "^9.1.0",
+    "pino-pretty": "^11.1.0",
+    "playwright": "^1.44.1",
+    "js-yaml": "^4.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "oracledb": "^6.5.0",
+    "@types/oracledb": "^6.5.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.1.4",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2",
+    "commander": "^12.1.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.12.12"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.17",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "glob": "^12.0.0",
+    "inflight": "npm:lru-cache@^10.2.2",
+    "js-yaml": "^4.1.0"
+  }
+}

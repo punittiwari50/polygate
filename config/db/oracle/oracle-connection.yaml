@@ -1,0 +1,52 @@
+# Oracle Connection Pool Configuration — PolyGate
+# Analogous to tnsnames.ora + connection pool DDL.
+# Environment-variable substitution: ${ENV_VAR} or ${ENV_VAR:default} resolved at startup.
+#
+# ⚠  NEVER commit real credentials. Use environment variables for all secrets.
+# ⚠  Add env-specific overrides to .gitignore (e.g. oracle-connection.local.yaml).
+#
+# OracleConnectionManager reads this file path from:
+#   ORACLE_CONFIG_PATH env var  (default: config/db/oracle/oracle-connection.yaml)
+
+connection:
+  # Oracle database user (schema owner)
+  user: "${ORACLE_USER:polygate}"
+
+  # Password via environment variable — NEVER hardcode
+  password: "${ORACLE_PASSWORD}"
+
+  # Oracle Easy Connect string or TNS alias
+  # Format: host:port/serviceName  OR  tnsAlias
+  connectString: "${ORACLE_CONNECT_STRING:localhost:1521/XEPDB1}"
+
+  # Optional: external authentication (wallet, Kerberos)
+  # externalAuth: false
+
+pool:
+  # Minimum number of open connections in the pool
+  min: 2
+
+  # Maximum number of open connections in the pool
+  max: 10
+
+  # Number of connections to add when pool is exhausted
+  increment: 1
+
+  # Maximum ms a caller waits for a connection before throwing (fast-fail)
+  queueTimeout: 2000
+
+  # TCP connection establishment timeout in ms (fast-fail)
+  connectionTimeout: 1500
+
+  # Pool name (useful for monitoring and AWR reports)
+  poolAlias: "polygate-pool"
+
+  # ms between pool ping health checks (0 = use Oracle default)
+  pingInterval: 60
+
+health:
+  # Interval (ms) between background health probes (0 = disabled)
+  probeIntervalMs: 30000
+
+  # Consecutive probe failures before 'degraded' event is emitted
+  failureThreshold: 3

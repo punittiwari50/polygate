@@ -1,0 +1,52 @@
+# Redis Connection Configuration — PolyGate
+# Analogous role to SQL DDL files: declarative, version-controlled, no secrets in plaintext.
+# Environment-variable substitution: ${ENV_VAR} is resolved by RedisConnectionManager at startup.
+#
+# ⚠  Do NOT commit real passwords or auth tokens. Use environment variables.
+# ⚠  Add env-specific overrides to .gitignore (e.g. redis-connection.local.yaml).
+#
+# RedisConnectionManager reads this file path from:
+#   REDIS_CONFIG_PATH env var  (default: config/db/redis/redis-connection.yaml)
+
+connection:
+  # TCP endpoint of the Redis server
+  host: "${REDIS_HOST:127.0.0.1}"
+  port: "${REDIS_PORT:6379}"
+
+  # Key namespace prefix — keeps PolyGate keys isolated from other apps on the same server
+  keyPrefix: "polygate:"
+
+  # TLS configuration (set tls: true and provide cert paths for production)
+  tls: false
+
+  # Optional AUTH password (leave blank for no-auth dev setups)
+  # password: "${REDIS_PASSWORD}"
+
+  # Redis database index (0-15)
+  db: 0
+
+pool:
+  # Minimum number of idle connections kept open in the pool
+  minIdle: 2
+
+  # Maximum concurrent connections ioredis will open
+  maxConnections: 10
+
+  # Maximum ms to wait for a connection from the pool before throwing (fast-fail)
+  acquireTimeoutMs: 2000
+
+  # TCP connection establishment timeout in ms (fast-fail)
+  connectTimeoutMs: 1500
+
+  # Delay between retry attempts in ms
+  retryDelayMs: 200
+
+  # Number of reconnect attempts before giving up and throwing
+  maxRetries: 3
+
+health:
+  # Interval (ms) between background PING health probes (0 = disabled)
+  probeIntervalMs: 30000
+
+  # If a probe fails this many times consecutively, the manager emits a 'degraded' event
+  failureThreshold: 3

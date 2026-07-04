@@ -1,0 +1,9 @@
+app:
+  appKey: kite
+  displayName: KITE Captured Application
+  baseUrl: https://kite.zerodha.com
+  loginUrl: https://kite.zerodha.com
+  authType: NONE
+  status: ACTIVE
+  loginSuccessUrlPattern: dashboard|portfolio
+  loginSuccessCookieName: kf_session|enctoken
