@@ -215,4 +215,77 @@ describe("Gateway HTTP Integration Tests", () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  it("should verify an endpoint targeting a specific session UUID via x-polygate-session-uuid header", async () => {
+    // 1. Create App
+    await request(gateway.getApp())
+      .post("/api/apps")
+      .send({
+        appKey: "uuid-app",
+        displayName: "UUID App",
+        baseUrl: "https://uuid.api.com",
+        authType: "API_KEY",
+        status: "ACTIVE"
+      });
+
+    // 2. Store Session 1
+    await request(gateway.getApp())
+      .post("/api/apps/uuid-app/sessions")
+      .send({
+        cookies: [{ name: "session_token", value: "user-1-cookie" }, { name: "userid", value: "user-1" }],
+        headers: { "X-Custom-Header": "user-1-header" }
+      });
+    
+    // 3. Store Session 2
+    await request(gateway.getApp())
+      .post("/api/apps/uuid-app/sessions")
+      .send({
+        cookies: [{ name: "session_token", value: "user-2-cookie" }, { name: "userid", value: "user-2" }],
+        headers: { "X-Custom-Header": "user-2-header" }
+      });
+
+    // Get the UUID of Session 1 (Session 1 is index 0 since list returns in insertion order)
+    const listRes = await request(gateway.getApp())
+      .get("/api/apps/uuid-app/sessions");
+    const sessionUuid1 = listRes.body[0].sessionUuid;
+
+    // 4. Create Endpoint Definition
+    await request(gateway.getApp())
+      .post("/api/apps/uuid-app/endpoints")
+      .send({
+        name: "testUuid",
+        path: "/test-uuid",
+        httpMethod: "GET",
+        requiresAuth: true
+      });
+
+    // 5. Mock global fetch
+    const mockResponse = new Response(JSON.stringify({ status: "ok" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+    const originalFetch = globalThis.fetch;
+    const fetchMock = jest.fn().mockResolvedValue(mockResponse);
+    globalThis.fetch = fetchMock;
+
+    try {
+      // 6. Call verify API with x-polygate-session-uuid targeting Session 1
+      const verifyRes = await request(gateway.getApp())
+        .post("/api/apps/uuid-app/verify/testUuid")
+        .set("x-polygate-session-uuid", sessionUuid1);
+
+      expect(verifyRes.status).toBe(200);
+
+      // Verify the downstream fetch received injected credentials of Session 1, NOT Session 2
+      expect(fetchMock).toHaveBeenCalled();
+      const lastCallArgs = fetchMock.mock.calls[0];
+      const options = lastCallArgs[1];
+
+      expect(options.headers["x-custom-header"]).toBe("user-1-header");
+      expect(options.headers["cookie"]).toBe("session_token=user-1-cookie; userid=user-1");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
+

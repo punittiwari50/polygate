@@ -388,4 +388,36 @@ describe("ProxyService Unit Tests", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][1].headers["authorization"]).toBe("Bearer tokenB"); // Injected User B's token!
   });
+
+  it("should resolve active session based on session UUID passed in request headers", async () => {
+    await sessionService.saveSession("dashboard-app", [{ name: "session_token", value: "cookie-1" }, { name: "userid", value: "user-1" }], { "X-Custom": "header-1" });
+    await sessionService.saveSession("dashboard-app", [{ name: "session_token", value: "cookie-2" }, { name: "userid", value: "user-2" }], { "X-Custom": "header-2" });
+
+    // Retrieve the sessions to get their UUIDs
+    const activeSessions = await sessionRepo.listSessions(1);
+    const sessionUuid1 = activeSessions[0].sessionUuid!; // First saved session (oldest)
+
+    // Mock global fetch
+    const mockResponse = new Response(JSON.stringify({ ok: true }), { status: 200 });
+    const fetchMock = jest.fn().mockResolvedValue(mockResponse);
+    globalThis.fetch = fetchMock;
+
+    // 2. Perform proxy call passing x-polygate-session-uuid header
+    const req: ProxyRequest = {
+      method: "GET",
+      path: "/api/profile",
+      queryParams: {},
+      headers: { "x-polygate-session-uuid": sessionUuid1 }
+    };
+
+    const res = await proxyService.proxy("dashboard-app", req);
+    expect(res.statusCode).toBe(200);
+
+    // Verify correct session credentials were injected
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const options = fetchMock.mock.calls[0][1];
+    expect(options.headers["x-custom"]).toBe("header-1");
+    expect(options.headers["cookie"]).toBe("session_token=cookie-1; userid=user-1");
+  });
 });
+

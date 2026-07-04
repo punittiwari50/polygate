@@ -137,14 +137,15 @@ pnpm --filter @polygate/cli run dev verify -a kite -e put_api_preferences
 pnpm --filter @polygate/cli run dev verify -a kite -e delete_oms_order
 ```
 
-##### Custom Request Bodies and Headers
+##### Custom Request Bodies, Headers, and Session UUIDs
 For `POST`, `PUT`, `PATCH`, and `DELETE` endpoints, you can supply custom request bodies and custom request headers directly via the CLI:
+* **`-s, --session <uuid>`**: Target a specific session UUID for multi-user verification. When specified, the gateway bypasses the default fallback to the latest active session and executes the request using the credentials (cookies/headers) of the chosen session.
 * **`-b, --body <json>`**: Specify a custom JSON payload string to send as the request body.
 * **`-H, --header <name:value>`**: Specify custom headers in `"Name:Value"` format (can be supplied multiple times).
 
 ```bash
-# Verify a POST endpoint sending a custom request body and header
-pnpm --filter @polygate/cli run dev verify -a kite -e post_oms_margins_orders -b '{"orders": [{"exchange": "NSE", "tradingsymbol": "INFY", "transaction_type": "BUY", "quantity": 100, "price": 1400}]}' -H "Content-Type:application/json" -H "X-Client-ID:external-client"
+# Verify a POST endpoint sending a custom request body, custom header, targeting a specific session UUID
+pnpm --filter @polygate/cli run dev verify -a kite -e post_oms_margins_orders -s 4b79b2d3-6f93-4536-91fd-7e9f38d679cd -b '{"orders": [{"exchange": "NSE", "tradingsymbol": "INFY", "transaction_type": "BUY", "quantity": 100, "price": 1400}]}' -H "Content-Type:application/json" -H "X-Client-ID:external-client"
 ```
 
 
