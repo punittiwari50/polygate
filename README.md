@@ -118,16 +118,25 @@ This command will launch a headful browser page navigating to `https://kite.zero
 
 #### Step 3: Verify the Endpoints
 Once authenticated, you can query and test specific Zerodha endpoints using the active session credentials:
-```bash
-# Verify the getMargins endpoint
+# Verify the getMargins endpoint (GET)
 pnpm --filter @polygate/cli run dev verify -a kite -e getMargins
 
-# Verify the getHoldings endpoint
+# Verify the getHoldings endpoint (GET)
 pnpm --filter @polygate/cli run dev verify -a kite -e getHoldings
 
 # Verify the getHoldings endpoint targeting a specific session UUID
 pnpm --filter @polygate/cli run dev verify -a kite -e getHoldings -s <sessionUuid>
+
+# Verify a POST endpoint (e.g., calculating margin requirements for a list of orders)
+pnpm --filter @polygate/cli run dev verify -a kite -e post_oms_margins_orders
+
+# Verify a PUT endpoint (e.g., updating basket contents or preferences)
+pnpm --filter @polygate/cli run dev verify -a kite -e put_api_preferences
+
+# Verify a DELETE endpoint (e.g., cancelling a pending order or deleting a basket)
+pnpm --filter @polygate/cli run dev verify -a kite -e delete_oms_order
 ```
+
 
 #### Step 4: List Stored Sessions (Tabular Format)
 To view all captured session metadata (UUIDs, user IDs, capture times, and active status) for an application in a tabular format, run:
