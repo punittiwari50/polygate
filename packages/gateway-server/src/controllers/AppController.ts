@@ -178,19 +178,23 @@ export class AppController {
       // Extract target session UUID if passed in verification headers
       const targetSessionUuid = req.headers["x-polygate-session-uuid"] || req.headers["x-polygate-session-uuid".toLowerCase()];
 
+      const { body: customBody, headers: customHeaders } = req.body || {};
+
       // Execute request definition using proxy
       const proxyService = container.resolve(ProxyService);
       
-      // Build dummy query parameters or values from schema or empty
+      const mergedHeaders = {
+        ...(matchedEndpoint.requestHeaders || {}),
+        ...(customHeaders || {}),
+        ...(targetSessionUuid ? { "x-polygate-session-uuid": String(targetSessionUuid) } : {})
+      };
+
       const proxyRes = await proxyService.proxy(appKey, {
         method: matchedEndpoint.httpMethod || "GET",
         path: matchedEndpoint.path || "/",
         queryParams: {},
-        headers: {
-          ...(matchedEndpoint.requestHeaders || {}),
-          ...(targetSessionUuid ? { "x-polygate-session-uuid": String(targetSessionUuid) } : {})
-        },
-        body: matchedEndpoint.sampleResponse ? matchedEndpoint.sampleResponse : undefined
+        headers: mergedHeaders,
+        body: customBody !== undefined ? customBody : (matchedEndpoint.sampleResponse ? matchedEndpoint.sampleResponse : undefined)
       });
 
       // Log remote request connection details

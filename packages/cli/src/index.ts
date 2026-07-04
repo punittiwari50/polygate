@@ -276,22 +276,38 @@ program
   .requiredOption("-a, --app <key>", "Application key (e.g. kite)")
   .requiredOption("-e, --endpoint <name>", "Recorded endpoint name")
   .option("-s, --session <uuid>", "Target session UUID for multi-user verification")
+  .option("-b, --body <json>", "Optional request body JSON string to send")
+  .option("-H, --header <headers...>", "Optional request headers in 'Name:Value' format (can be specified multiple times)")
   .action(async (options) => {
     const appKey = options.app;
     const epName = options.endpoint;
     const sessionUuid = options.session;
+    const bodyStr = options.body;
+    const headerOpts = options.header || [];
 
     console.log(`Verifying endpoint ${epName} for application ${appKey}...`);
 
     try {
-      const headers: Record<string, string> = {};
-      if (sessionUuid) {
-        headers["x-polygate-session-uuid"] = sessionUuid;
+      const customHeaders: Record<string, string> = {};
+      for (const h of headerOpts) {
+        const idx = h.indexOf(":");
+        if (idx !== -1) {
+          const name = h.substring(0, idx).trim();
+          const val = h.substring(idx + 1).trim();
+          customHeaders[name] = val;
+        }
       }
 
       const res = await fetch(`${GATEWAY_URL}/api/apps/${appKey}/verify/${epName}`, {
         method: "POST",
-        headers
+        headers: {
+          "content-type": "application/json",
+          ...(sessionUuid ? { "x-polygate-session-uuid": sessionUuid } : {})
+        },
+        body: JSON.stringify({
+          body: bodyStr,
+          headers: customHeaders
+        })
       });
 
       if (!res.ok) {
