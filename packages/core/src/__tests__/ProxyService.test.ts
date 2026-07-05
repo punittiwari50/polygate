@@ -622,5 +622,71 @@ describe("ProxyService Unit Tests", () => {
     delete process.env.MY_AUTH_TOKEN;
     delete process.env.DEBUG_MODE;
   });
+
+  it("should dynamically adapt sec-ch-ua-platform and user-agent based on host OS platform", async () => {
+    await appRepo.upsert({
+      appKey: "os-app",
+      displayName: "OS App",
+      baseUrl: "https://api.example.com",
+      authType: "NONE",
+      status: "ACTIVE"
+    });
+
+    const originalPlatform = process.platform;
+    
+    // Mock Darwin (macOS)
+    Object.defineProperty(process, "platform", {
+      value: "darwin",
+      configurable: true
+    });
+
+    let fetchMock = jest.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok" }), { status: 200 }));
+    globalThis.fetch = fetchMock;
+
+    await proxyService.proxy("os-app", {
+      method: "GET",
+      path: "/test",
+      queryParams: {},
+      headers: {
+        "sec-ch-ua-platform": '"Windows"',
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    let options = fetchMock.mock.calls[0][1];
+    expect(options.headers["sec-ch-ua-platform"]).toBe('"macOS"');
+    expect(options.headers["user-agent"]).toBe("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36");
+
+    // Mock Linux
+    Object.defineProperty(process, "platform", {
+      value: "linux",
+      configurable: true
+    });
+
+    fetchMock = jest.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok" }), { status: 200 }));
+    globalThis.fetch = fetchMock;
+
+    await proxyService.proxy("os-app", {
+      method: "GET",
+      path: "/test",
+      queryParams: {},
+      headers: {
+        "sec-ch-ua-platform": '"Windows"',
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    options = fetchMock.mock.calls[0][1];
+    expect(options.headers["sec-ch-ua-platform"]).toBe('"Linux"');
+    expect(options.headers["user-agent"]).toBe("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36");
+
+    // Restore original platform
+    Object.defineProperty(process, "platform", {
+      value: originalPlatform,
+      configurable: true
+    });
+  });
 });
 

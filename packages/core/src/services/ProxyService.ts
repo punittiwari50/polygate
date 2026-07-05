@@ -303,6 +303,8 @@ export class ProxyService {
       }
     }
 
+    this.adaptOsHeaders(finalHeaders);
+
     // 4. Construct downstream URL
     let normalizedBaseUrl = app.baseUrl.trim();
     if (!/^https?:\/\//i.test(normalizedBaseUrl)) {
@@ -533,5 +535,41 @@ export class ProxyService {
         return `${name}=[REDACTED]`;
       })
       .join("; ");
+  }
+
+  private adaptOsHeaders(headers: Record<string, string>): void {
+    const platform = process.platform;
+
+    // 1. Adapt sec-ch-ua-platform
+    const platformKey = Object.keys(headers).find(k => k.toLowerCase() === "sec-ch-ua-platform");
+    const platformValues: Record<string, string> = {
+      win32: '"Windows"',
+      darwin: '"macOS"',
+      linux: '"Linux"'
+    };
+    if (platformKey) {
+      headers[platformKey] = platformValues[platform] || '"Windows"';
+    }
+
+    // 2. Adapt user-agent
+    const uaKey = Object.keys(headers).find(k => k.toLowerCase() === "user-agent");
+    if (uaKey && headers[uaKey]) {
+      const ua = headers[uaKey];
+      const winPattern = /Windows NT \d+\.\d+;\s*Win64;\s*x64/gi;
+      const macPattern = /Macintosh;\s*Intel\s*Mac\s*OS\s*X\s*\d+[_\d]*/gi;
+      const linuxPattern = /X11;\s*Linux\s*x86_64/gi;
+
+      const uaReplacements: Record<string, string> = {
+        win32: "Windows NT 10.0; Win64; x64",
+        darwin: "Macintosh; Intel Mac OS X 10_15_7",
+        linux: "X11; Linux x86_64"
+      };
+      const targetReplacement = uaReplacements[platform] || "Windows NT 10.0; Win64; x64";
+
+      const matchedPattern = [winPattern, macPattern, linuxPattern].find(pattern => pattern.test(ua));
+      if (matchedPattern) {
+        headers[uaKey] = ua.replace(matchedPattern, targetReplacement);
+      }
+    }
   }
 }
