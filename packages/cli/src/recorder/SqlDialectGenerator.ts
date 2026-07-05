@@ -125,7 +125,7 @@ INSERT INTO PG_APPLICATION_VERSION (
     const headers = ep.requestHeaders ? JSON.stringify(ep.requestHeaders) : null;
     const reqSchema = ep.requestBodySchema ? JSON.stringify(ep.requestBodySchema) : null;
     const resSchema = ep.responseBodySchema ? JSON.stringify(ep.responseBodySchema) : null;
-    const sampleRes = ep.sampleResponse ? JSON.stringify(ep.sampleResponse) : null;
+    const sampleRes = null;
 
     return `INSERT INTO PG_ENDPOINT_DEFINITION (
     VERSION_ID, NAME, PURPOSE_ID, PROTOCOL_TYPE, PATH, HTTP_METHOD, REQUIRES_AUTH, REQUEST_HEADERS, REQUEST_BODY_SCHEMA, RESPONSE_BODY_SCHEMA, SAMPLE_RESPONSE, DESCRIPTION
@@ -245,7 +245,7 @@ INSERT IGNORE INTO PG_APPLICATION_VERSION (
     const headers = ep.requestHeaders ? JSON.stringify(ep.requestHeaders) : null;
     const reqSchema = ep.requestBodySchema ? JSON.stringify(ep.requestBodySchema) : null;
     const resSchema = ep.responseBodySchema ? JSON.stringify(ep.responseBodySchema) : null;
-    const sampleRes = ep.sampleResponse ? JSON.stringify(ep.sampleResponse) : null;
+    const sampleRes = null;
 
     return `INSERT INTO PG_ENDPOINT_DEFINITION (
     VERSION_ID, NAME, PURPOSE_ID, PROTOCOL_TYPE, PATH, HTTP_METHOD, REQUIRES_AUTH, REQUEST_HEADERS, REQUEST_BODY_SCHEMA, RESPONSE_BODY_SCHEMA, SAMPLE_RESPONSE, DESCRIPTION
@@ -410,7 +410,7 @@ WHEN NOT MATCHED THEN
     const headers = ep.requestHeaders ? JSON.stringify(ep.requestHeaders) : null;
     const reqSchema = ep.requestBodySchema ? JSON.stringify(ep.requestBodySchema) : null;
     const resSchema = ep.responseBodySchema ? JSON.stringify(ep.responseBodySchema) : null;
-    const sampleRes = ep.sampleResponse ? JSON.stringify(ep.sampleResponse) : null;
+    const sampleRes = null;
 
     return `MERGE INTO PG_ENDPOINT_DEFINITION target
 USING (

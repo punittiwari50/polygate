@@ -168,3 +168,7 @@ config/secrets/
 session-store/
 sessions.json
 
+# Seed YAML and DML SQL files
+seed-data/endpoints/
+config/db/*/*-dml.sql
+
