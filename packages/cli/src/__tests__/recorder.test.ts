@@ -198,7 +198,7 @@ describe("Playwright Recorder & SQL Generator Subsystem Tests", () => {
       expect(ep.requestHeaders).toEqual({
         "authorization": "required",
         "x-session-id": "required",
-        "content-type": "application/json"
+        "content-type": "required"
       });
 
       fs.rmSync(tempSeedDir, { recursive: true, force: true });

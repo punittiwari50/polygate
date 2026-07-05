@@ -161,9 +161,9 @@ export class PlaywrightRecorder {
         const lowerKey = key.toLowerCase();
         const isCustomOrAuth = lowerKey.startsWith("x-") || lowerKey === "authorization";
         const matchesCapture = matchesCaptureHeaders(key, capturePattern);
-        const headerValue = !isCustomOrAuth
-          ? value
-          : (matchesCapture ? "required" : undefined);
+        const headerValue = !isCustomOrAuth || matchesCapture
+          ? "required"
+          : undefined;
 
         if (headerValue !== undefined) {
           filteredHeaders[key] = headerValue;
@@ -333,7 +333,6 @@ export class PlaywrightRecorder {
             requestHeaders: ep.requestHeaders,
             requestBody: ep.requestBodySchema,
             responseBody: ep.responseBodySchema,
-            sampleResponse: ep.sampleResponse,
             description: ep.description
           }
         }),
