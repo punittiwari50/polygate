@@ -4,6 +4,7 @@ import { SchemaGenerator } from "@/recorder/SchemaGenerator.js";
 import { SqlGeneratorFactory } from "@/recorder/SqlGeneratorFactory.js";
 import { SeedToSqlConverter } from "@/recorder/SeedToSqlConverter.js";
 import { Validator } from "@/recorder/Validator.js";
+import { PlaywrightRecorder } from "@/recorder/PlaywrightRecorder.js";
 
 describe("Playwright Recorder & SQL Generator Subsystem Tests", () => {
   
@@ -149,6 +150,59 @@ describe("Playwright Recorder & SQL Generator Subsystem Tests", () => {
       expect(validation.isValid).toBe(true);
 
       fs.unlinkSync(pgSqlPath);
+    });
+  });
+
+  describe("PlaywrightRecorder Unit Tests", () => {
+    it("should redact session capture headers to 'required'", async () => {
+      const tempSeedDir = path.join(__dirname, "temp-recorder-seed");
+      fs.mkdirSync(path.join(tempSeedDir, "apps"), { recursive: true });
+      fs.writeFileSync(
+        path.join(tempSeedDir, "apps", "testapp.yaml"),
+        `app:
+  appKey: testapp
+  displayName: Test App
+  baseUrl: http://localhost:3000
+  sessionCaptureHeaders: authorization,x-session-id`,
+        "utf8"
+      );
+
+      const recorder = new PlaywrightRecorder("testapp", "http://localhost:3000");
+      process.env.SEED_DIR = tempSeedDir;
+
+      const mockRequest = {
+        resourceType: () => "fetch",
+        method: () => "POST",
+        headers: () => ({
+          "authorization": "Bearer token123",
+          "x-session-id": "sess-456",
+          "x-static-header": "static-789",
+          "content-type": "application/json"
+        }),
+        postData: () => null
+      };
+
+      const mockResponse = {
+        url: () => "http://localhost:3000/api/users",
+        request: () => mockRequest,
+        status: () => 200,
+        json: () => Promise.resolve({ success: true })
+      };
+
+      const mockPage = {};
+
+      await (recorder as any).handleResponse(mockResponse, mockPage);
+
+      const ep = (recorder as any).endpoints.get("post_api_users");
+      expect(ep).toBeDefined();
+      expect(ep.requestHeaders).toEqual({
+        "authorization": "required",
+        "x-session-id": "required",
+        "content-type": "application/json"
+      });
+
+      fs.rmSync(tempSeedDir, { recursive: true, force: true });
+      delete process.env.SEED_DIR;
     });
   });
 });

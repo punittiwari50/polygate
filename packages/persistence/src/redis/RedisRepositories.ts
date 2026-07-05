@@ -97,6 +97,20 @@ export class RedisSessionRepository implements ISessionRepository {
     await this.redis.set(`session:${sessionId}`, JSON.stringify(session));
   }
 
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    const keys = await this.redis.keys("session:*");
+    for (const key of keys) {
+      if (key.endsWith(":id_counter")) continue;
+      const val = await this.redis.get(key);
+      if (val) {
+        const session = JSON.parse(val) as SessionCredential;
+        if (session.appId === appId && !session.isActive) {
+          await this.redis.del(key);
+        }
+      }
+    }
+  }
+
   public async flushAll(): Promise<void> {
     const keys: string[] = await this.redis.keys("*");
     if (keys.length > 0) {

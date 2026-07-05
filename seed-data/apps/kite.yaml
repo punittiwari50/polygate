@@ -7,3 +7,4 @@ app:
   status: ACTIVE
   loginSuccessUrlPattern: dashboard|portfolio
   loginSuccessCookieName: kf_session|enctoken
+  sessionCaptureHeaders: authorization,x-kite-*

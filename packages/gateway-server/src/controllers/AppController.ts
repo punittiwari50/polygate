@@ -131,10 +131,16 @@ export class AppController {
    */
   public static async logoutSession(req: Request, res: Response) {
     const { appKey } = req.params;
+    const clearInactive = req.query.inactive === "true";
     try {
       const sessionService = container.resolve(SessionService);
-      await sessionService.invalidateActiveSession(appKey);
-      res.json({ status: "success", message: "Active session invalidated successfully" });
+      if (clearInactive) {
+        await sessionService.deleteInactiveSessions(appKey);
+        res.json({ status: "success", message: "Inactive sessions cleared successfully" });
+      } else {
+        await sessionService.invalidateActiveSession(appKey);
+        res.json({ status: "success", message: "Active session invalidated successfully" });
+      }
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }

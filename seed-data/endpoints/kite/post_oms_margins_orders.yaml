@@ -1,0 +1,190 @@
+endpoint:
+  app: kite
+  name: post_oms_margins_orders
+  path: /oms/margins/orders
+  method: POST
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/orders
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+    content-type: application/json
+  requestBody:
+    type: array
+    items:
+      type: object
+      properties:
+        exchange:
+          type: string
+        tradingsymbol:
+          type: string
+        transaction_type:
+          type: string
+        variety:
+          type: string
+        product:
+          type: string
+        order_type:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: integer
+      required:
+        - exchange
+        - tradingsymbol
+        - transaction_type
+        - variety
+        - product
+        - order_type
+        - quantity
+        - price
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            tradingsymbol:
+              type: string
+            exchange:
+              type: string
+            span:
+              type: integer
+            exposure:
+              type: integer
+            option_premium:
+              type: integer
+            additional:
+              type: integer
+            bo:
+              type: integer
+            cash:
+              type: integer
+            var:
+              type: integer
+            mtf:
+              type: integer
+            pnl:
+              type: object
+              properties:
+                realised:
+                  type: integer
+                unrealised:
+                  type: integer
+              required:
+                - realised
+                - unrealised
+            leverage:
+              type: integer
+            charges:
+              type: object
+              properties:
+                transaction_tax:
+                  type: number
+                transaction_tax_type:
+                  type: string
+                exchange_turnover_charge:
+                  type: number
+                sebi_turnover_charge:
+                  type: number
+                brokerage:
+                  type: number
+                stamp_duty:
+                  type: integer
+                gst:
+                  type: object
+                  properties:
+                    igst:
+                      type: number
+                    cgst:
+                      type: integer
+                    sgst:
+                      type: integer
+                    total:
+                      type: number
+                  required:
+                    - igst
+                    - cgst
+                    - sgst
+                    - total
+                total:
+                  type: number
+              required:
+                - transaction_tax
+                - transaction_tax_type
+                - exchange_turnover_charge
+                - sebi_turnover_charge
+                - brokerage
+                - stamp_duty
+                - gst
+                - total
+            total:
+              type: integer
+          required:
+            - type
+            - tradingsymbol
+            - exchange
+            - span
+            - exposure
+            - option_premium
+            - additional
+            - bo
+            - cash
+            - var
+            - mtf
+            - pnl
+            - leverage
+            - charges
+            - total
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - type: equity
+        tradingsymbol: MARKSANS
+        exchange: NSE
+        span: 0
+        exposure: 0
+        option_premium: 0
+        additional: 0
+        bo: 0
+        cash: 0
+        var: 120
+        mtf: 0
+        pnl:
+          realised: 0
+          unrealised: 0
+        leverage: 5
+        charges:
+          transaction_tax: 0.15
+          transaction_tax_type: stt
+          exchange_turnover_charge: 0.01842
+          sebi_turnover_charge: 0.0006
+          brokerage: 0.18
+          stamp_duty: 0
+          gst:
+            igst: 0.0358236
+            cgst: 0
+            sgst: 0
+            total: 0.0358236
+          total: 0.38484359999999995
+        total: 120
+  description: Captured API Endpoint for kite.

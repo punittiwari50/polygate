@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { Command } from "commander";
 import { chromium } from "playwright";
-import { version } from "@polygate/core";
+import { version, matchesCaptureHeaders } from "@polygate/core";
 import {
   PersistenceAdapterFactory,
   YamlPersistenceAdapter
@@ -182,16 +182,12 @@ program
       }
     });
 
-    // Capture custom request headers (like x-kite-* and authorization) sent by browser
+    // Capture custom request headers (dynamic capture rules) sent by browser
     page.on("request", (request) => {
       try {
         const headers = request.headers();
         for (const [key, value] of Object.entries(headers)) {
-          const lowerKey = key.toLowerCase();
-          if (
-            lowerKey.startsWith("x-") ||
-            lowerKey === "authorization"
-          ) {
+          if (matchesCaptureHeaders(key, app.sessionCaptureHeaders)) {
             lastHeaders[key] = value;
           }
         }
@@ -202,8 +198,14 @@ program
 
     await page.goto(app.loginUrl);
 
-    const successPattern = app.loginSuccessUrlPattern || "dashboard|home|portfolio|account";
-    const successCookie = app.loginSuccessCookieName || "kf_session|enctoken|session|sid|token";
+    const successPattern = app.loginSuccessUrlPattern;
+    const successCookie = app.loginSuccessCookieName;
+
+    if (!successPattern && !successCookie) {
+      console.error("Error: Application config must define loginSuccessUrlPattern or loginSuccessCookieName in YAML/SQL to detect login completion.");
+      await browser.close();
+      process.exit(1);
+    }
 
     let success = false;
     // Poll for success signal
@@ -367,6 +369,41 @@ program
       })));
     } catch (err: any) {
       console.error(`Error listing sessions: ${err.message}`);
+    }
+  });
+
+// 4c. session:clear
+program
+  .command("session:clear")
+  .description("Clear the active captured session or clear all inactive sessions for an application")
+  .requiredOption("-a, --app <key>", "Application key (e.g. kite)")
+  .option("-i, --inactive", "Clear all inactive sessions instead of the active one")
+  .action(async (options) => {
+    const appKey = options.app;
+    const clearInactive = !!options.inactive;
+
+    if (clearInactive) {
+      console.log(`Clearing all inactive sessions for application ${appKey}...`);
+    } else {
+      console.log(`Clearing the active captured session for application ${appKey}...`);
+    }
+
+    try {
+      const url = `${GATEWAY_URL}/api/apps/${appKey}/sessions${clearInactive ? "?inactive=true" : ""}`;
+      const res = await fetch(url, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error(`Failed to clear session: ${text}`);
+        process.exit(1);
+      }
+
+      const result = await res.json() as any;
+      console.log(result.message || "Session cleared successfully.");
+    } catch (err: any) {
+      console.error(`Error clearing session: ${err.message}`);
     }
   });
 

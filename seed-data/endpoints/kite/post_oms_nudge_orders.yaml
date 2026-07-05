@@ -1,0 +1,102 @@
+endpoint:
+  app: kite
+  name: post_oms_nudge_orders
+  path: /oms/nudge/orders
+  method: POST
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/orders
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+    content-type: application/json
+  requestBody:
+    type: array
+    items:
+      type: object
+      properties:
+        exchange:
+          type: string
+        tradingsymbol:
+          type: string
+        transaction_type:
+          type: string
+        variety:
+          type: string
+        product:
+          type: string
+        order_type:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: integer
+        context:
+          type: string
+      required:
+        - exchange
+        - tradingsymbol
+        - transaction_type
+        - variety
+        - product
+        - order_type
+        - quantity
+        - price
+        - context
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              message:
+                type: string
+              description:
+                type: string
+              severity:
+                type: string
+              prompt:
+                type: boolean
+            required:
+              - type
+              - message
+              - description
+              - severity
+              - prompt
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - - type: surveillance_indicator_nudge
+          message: >-
+            MARKSANS has the following cautionary messages - <br>1. Close to
+            Close price movement of 50 percentage in 3 months<br>Please analyse
+            the risks carefully before proceeding. [Read
+            more.](https://support.zerodha.com/category/trading-and-markets/trading-faqs/trading-categories-and-groups/articles/risk-associated-with-surveillance-measures)
+          description: >-
+            MARKSANS has the following cautionary messages - <br>1. Close to
+            Close price movement of 50 percentage in 3 months<br>Please analyse
+            the risks carefully before proceeding. Click Place Order to continue
+            selling. [Read
+            more.](https://support.zerodha.com/category/trading-and-markets/trading-faqs/trading-categories-and-groups/articles/risk-associated-with-surveillance-measures)
+          severity: exchange
+          prompt: true
+  description: Captured API Endpoint for kite.

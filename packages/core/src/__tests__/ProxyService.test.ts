@@ -60,6 +60,13 @@ class MockSessionRepository implements ISessionRepository {
     const s = this.sessions.get(sessionId);
     if (s) s.isActive = false;
   }
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    for (const [id, session] of this.sessions.entries()) {
+      if (session.appId === appId && !session.isActive) {
+        this.sessions.delete(id);
+      }
+    }
+  }
 }
 
 class MockEndpointRepository implements IEndpointRepository {
@@ -418,6 +425,202 @@ describe("ProxyService Unit Tests", () => {
     const options = fetchMock.mock.calls[0][1];
     expect(options.headers["x-custom"]).toBe("header-1");
     expect(options.headers["cookie"]).toBe("session_token=cookie-1; userid=user-1");
+  });
+
+  it("should filter injected session headers based on sessionCaptureHeaders pattern", async () => {
+    // 1. Create app with custom capture headers pattern
+    await appRepo.upsert({
+      appKey: "capture-headers-app",
+      displayName: "Capture Headers App",
+      baseUrl: "https://capture.local",
+      authType: "NONE",
+      status: "ACTIVE",
+      sessionCaptureHeaders: "x-allowed-*,authorization"
+    });
+
+    // 2. Save active session with headers that are allowed and others that are ignored
+    await sessionService.saveSession(
+      "capture-headers-app",
+      [],
+      {
+        "Authorization": "Bearer token123",
+        "X-Allowed-Header": "yes",
+        "X-Ignored-Header": "no",
+        "Some-Other-Header": "no-again"
+      }
+    );
+
+    // 3. Mock global fetch
+    const mockResponse = new Response(JSON.stringify({ ok: true }), { status: 200 });
+    const fetchMock = jest.fn().mockResolvedValue(mockResponse);
+    globalThis.fetch = fetchMock;
+
+    // 4. Perform proxy call
+    const req: ProxyRequest = {
+      method: "GET",
+      path: "/test",
+      queryParams: {},
+      headers: {}
+    };
+
+    const res = await proxyService.proxy("capture-headers-app", req);
+    expect(res.statusCode).toBe(200);
+
+    // 5. Verify custom headers were mapped correctly
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, options] = fetchMock.mock.calls[0];
+
+    expect(options.headers["authorization"]).toBe("Bearer token123");
+    expect(options.headers["x-allowed-header"]).toBe("yes");
+    expect(options.headers["x-ignored-header"]).toBeUndefined();
+    expect(options.headers["some-other-header"]).toBeUndefined();
+  });
+
+  it("should fail validation and return 400 if required request headers or request body schemas are violated", async () => {
+    // 1. Create app with validation rules
+    const app = await appRepo.upsert({
+      appKey: "val-app",
+      displayName: "Validation App",
+      baseUrl: "https://val.local",
+      authType: "NONE",
+      status: "ACTIVE"
+    });
+
+    // 2. Define endpoint with required header and body schema
+    await endpointService.upsertEndpoint("val-app", {
+      name: "testVal",
+      path: "/profile",
+      httpMethod: "POST",
+      requiresAuth: false,
+      requestHeaders: {
+        "X-Mandatory-Header": "required",
+        "X-Optional-Header": "optional"
+      },
+      requestBodySchema: {
+        type: "object",
+        required: ["username"],
+        properties: {
+          username: { type: "string" }
+        }
+      }
+    });
+
+    // 3. Perform proxy call with missing header
+    const req1: ProxyRequest = {
+      method: "POST",
+      path: "/profile",
+      queryParams: {},
+      headers: {}, // missing X-Mandatory-Header
+      body: { username: "punit" }
+    };
+
+    const res1 = await proxyService.proxy("val-app", req1);
+    expect(res1.statusCode).toBe(400);
+    const body1 = JSON.parse(res1.body.toString());
+    expect(body1.error).toContain("Missing required header fields: X-Mandatory-Header");
+
+    // 4. Perform proxy call with missing required body field
+    const req2: ProxyRequest = {
+      method: "POST",
+      path: "/profile",
+      queryParams: {},
+      headers: { "X-Mandatory-Header": "present" },
+      body: {} // missing username
+    };
+
+    const res2 = await proxyService.proxy("val-app", req2);
+    expect(res2.statusCode).toBe(400);
+    const body2 = JSON.parse(res2.body.toString());
+    expect(body2.error).toContain("Request validation failed: Missing required property: username");
+
+    // 5. Perform proxy call satisfying both
+    const fetchMock = jest.fn().mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 200 }));
+    globalThis.fetch = fetchMock;
+
+    const req3: ProxyRequest = {
+      method: "POST",
+      path: "/profile",
+      queryParams: {},
+      headers: { "X-Mandatory-Header": "present" },
+      body: { username: "punit" }
+    };
+
+    const res3 = await proxyService.proxy("val-app", req3);
+    expect(res3.statusCode).toBe(200);
+  });
+
+  it("should interpolate environment variable placeholders in request headers, query parameters, target URLs, and request bodies", async () => {
+    // 1. Create app
+    await appRepo.upsert({
+      appKey: "env-app",
+      displayName: "Env App",
+      baseUrl: "https://${TARGET_HOST}/api",
+      authType: "NONE",
+      status: "ACTIVE"
+    });
+
+    // 2. Define endpoint
+    await endpointService.upsertEndpoint("env-app", {
+      name: "testEnv",
+      path: "/users/${USER_PATH}",
+      httpMethod: "POST",
+      requiresAuth: false,
+      requestHeaders: {
+        "x-api-key": "env:MY_API_KEY",
+        "authorization": "Bearer ${MY_AUTH_TOKEN}"
+      }
+    });
+
+    // Set environment variables
+    process.env.TARGET_HOST = "api.example.com";
+    process.env.USER_PATH = "punit";
+    process.env.MY_API_KEY = "key123";
+    process.env.MY_AUTH_TOKEN = "token456";
+
+    const fetchMock = jest.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok" }), { status: 200 }));
+    globalThis.fetch = fetchMock;
+
+    // 3. Perform proxy call
+    const req: ProxyRequest = {
+      method: "POST",
+      path: "/users/${USER_PATH}",
+      queryParams: {
+        "debug": "${DEBUG_MODE}",
+        "token": "env:MY_AUTH_TOKEN"
+      },
+      headers: {
+        "x-api-key": "env:MY_API_KEY",
+        "authorization": "Bearer ${MY_AUTH_TOKEN}",
+        "x-other": "static-value"
+      },
+      body: "hello-${USER_PATH}-suffix"
+    };
+
+    process.env.DEBUG_MODE = "true";
+
+    const res = await proxyService.proxy("env-app", req);
+    expect(res.statusCode).toBe(200);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [targetUrl, options] = fetchMock.mock.calls[0];
+
+    // Assert URL interpolation
+    expect(targetUrl).toBe("https://api.example.com/api/users/punit?debug=true&token=token456");
+
+    // Assert header interpolation
+    expect(options.headers["x-api-key"]).toBe("key123");
+    expect(options.headers["authorization"]).toBe("Bearer token456");
+    expect(options.headers["x-other"]).toBe("static-value");
+
+    // Assert body interpolation
+    expect(options.body).toBe("hello-punit-suffix");
+
+    // Clean up
+    delete process.env.TARGET_HOST;
+    delete process.env.USER_PATH;
+    delete process.env.MY_API_KEY;
+    delete process.env.MY_AUTH_TOKEN;
+    delete process.env.DEBUG_MODE;
   });
 });
 

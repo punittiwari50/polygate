@@ -12,6 +12,7 @@ export interface AppAccessChannel {
   loginSuccessCookieName?: string;
   sessionInjectionRules?: string;
   userIdCookieName?: string;
+  sessionCaptureHeaders?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

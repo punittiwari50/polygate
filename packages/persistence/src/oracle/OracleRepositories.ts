@@ -7,7 +7,8 @@ import {
   IAppRepository,
   ISessionRepository,
   IEndpointRepository,
-  IAuditLogRepository
+  IAuditLogRepository,
+  IConnectionManager
 } from "@polygate/core";
 import fs from "fs";
 import path from "path";
@@ -31,23 +32,25 @@ class OracleConfigLoader {
  * OracleConnectionManager — config-file-driven Oracle connection pool.
  *
  * Golden Rules satisfied:
- *  Rule 3 — Class-based; implements IConnectionManager shape (static + instance).
+ *  Rule 3 — Class-based; implements IConnectionManager interface.
  *  Rule 4 — SRP: owns only Oracle connection lifecycle.
  *  Rule 6 — No cyclic imports.
  *  Rule 7 — Pool (7.1), fast-fail via queueTimeout (7.2), healthCheck (7.3), config file (7.6).
  */
-export class OracleConnectionManager {
-  private static pool: oracledb.Pool | null = null;
-  private static _isHealthy = false;
-  private static oracledbModule: any = null;
+export class OracleConnectionManager implements IConnectionManager {
+  private static defaultInstance = new OracleConnectionManager();
 
-  private static async getOracledb(): Promise<any> {
-    if (!OracleConnectionManager.oracledbModule) {
-      OracleConnectionManager.oracledbModule = await import("oracledb").catch((err) => {
+  private pool: oracledb.Pool | null = null;
+  private _isHealthy = false;
+  private oracledbModule: any = null;
+
+  private async getOracledb(): Promise<any> {
+    if (!this.oracledbModule) {
+      this.oracledbModule = await import("oracledb").catch((err) => {
         throw new Error("Failed to load oracledb optional dependency. Ensure it is installed: " + err.message);
       });
     }
-    return OracleConnectionManager.oracledbModule;
+    return this.oracledbModule;
   }
 
   private static readonly DEFAULT_CONFIG_PATH = path.resolve(
@@ -55,22 +58,21 @@ export class OracleConnectionManager {
     "config/db/oracle/oracle-connection.yaml"
   );
 
-  public static get isHealthy(): boolean {
-    return OracleConnectionManager._isHealthy;
+  public get isHealthy(): boolean {
+    return this._isHealthy;
   }
 
   /**
-   * Initialize pool from a YAML connection config file (config/db/oracle/oracle-connection.yaml).
-   * Fast-fail: oracledb's queueTimeout enforces a hard deadline on pool acquisition.
+   * Initialize pool from a YAML connection config file.
    *
    * @param configPath - Optional override path to the YAML config file.
    */
-  public static async initFromConfig(configPath?: string): Promise<void> {
+  public async connect(configPath?: string): Promise<void> {
     const resolvedPath = configPath ?? OracleConnectionManager.DEFAULT_CONFIG_PATH;
     const loader = new OracleConfigLoader();
     const cfg = loader.load(resolvedPath);
 
-    await OracleConnectionManager.init({
+    await this.init({
       user: cfg.connection.user,
       password: cfg.connection.password,
       connectString: cfg.connection.connectString,
@@ -84,11 +86,11 @@ export class OracleConnectionManager {
     });
   }
 
-  /** Initialize from raw config object (kept for backward compatibility with tests). */
-  public static async init(config: oracledb.PoolAttributes): Promise<void> {
-    if (OracleConnectionManager.pool) return;
+  /** Initialize from raw config object. */
+  public async init(config: oracledb.PoolAttributes): Promise<void> {
+    if (this.pool) return;
 
-    const oracledbLib = await OracleConnectionManager.getOracledb();
+    const oracledbLib = await this.getOracledb();
     const createPoolPromise = oracledbLib.createPool(config);
     const timeoutMs = (config as any).connectTimeout ?? 1500;
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -98,44 +100,47 @@ export class OracleConnectionManager {
       )
     );
 
-    OracleConnectionManager.pool = await Promise.race([createPoolPromise, timeoutPromise]);
-    OracleConnectionManager._isHealthy = true;
+    this.pool = await Promise.race([createPoolPromise, timeoutPromise]);
+    this._isHealthy = true;
+
+    // Set default static instance for repositories' backward-compatibility
+    OracleConnectionManager.defaultInstance = this;
   }
 
-  public static async close(): Promise<void> {
-    if (OracleConnectionManager.pool) {
-      await OracleConnectionManager.pool.close();
-      OracleConnectionManager.pool = null;
-      OracleConnectionManager._isHealthy = false;
+  public async close(): Promise<void> {
+    if (this.pool) {
+      await this.pool.close();
+      this.pool = null;
+      this._isHealthy = false;
     }
   }
 
-  public static async getConnection(): Promise<oracledb.Connection> {
-    if (!OracleConnectionManager.pool) {
-      throw new Error("Oracle connection pool not initialized. Call OracleConnectionManager.initFromConfig() first.");
+  public async getConnection(): Promise<oracledb.Connection> {
+    if (!this.pool) {
+      throw new Error("Oracle connection pool not initialized. Call connect() first.");
     }
-    return OracleConnectionManager.pool.getConnection();
+    return this.pool.getConnection();
   }
 
   /** PING health probe — executes SELECT 1 FROM DUAL, never throws (Rule 7.3). */
-  public static async healthCheck(): Promise<boolean> {
+  public async healthCheck(): Promise<boolean> {
     try {
-      await OracleConnectionManager.execute("SELECT 1 FROM DUAL");
-      OracleConnectionManager._isHealthy = true;
+      await this.execute("SELECT 1 FROM DUAL");
+      this._isHealthy = true;
       return true;
     } catch {
-      OracleConnectionManager._isHealthy = false;
+      this._isHealthy = false;
       return false;
     }
   }
 
-  public static async execute<T = any>(
+  public async execute<T = any>(
     sql: string,
     binds: any = [],
     options: oracledb.ExecuteOptions = {}
   ): Promise<oracledb.Result<T>> {
-    const conn = await OracleConnectionManager.getConnection();
-    const oracledbLib = await OracleConnectionManager.getOracledb();
+    const conn = await this.getConnection();
+    const oracledbLib = await this.getOracledb();
     try {
       options.outFormat = oracledbLib.OUT_FORMAT_OBJECT;
       options.autoCommit = options.autoCommit ?? true;
@@ -144,6 +149,28 @@ export class OracleConnectionManager {
     } finally {
       await conn.close();
     }
+  }
+
+  // ── Static delegates for backward-compatibility with repositories ───────────
+
+  public static async execute<T = any>(
+    sql: string,
+    binds: any = [],
+    options: oracledb.ExecuteOptions = {}
+  ): Promise<oracledb.Result<T>> {
+    return OracleConnectionManager.defaultInstance.execute<T>(sql, binds, options);
+  }
+
+  public static async getConnection(): Promise<oracledb.Connection> {
+    return OracleConnectionManager.defaultInstance.getConnection();
+  }
+
+  public static async initFromConfig(configPath?: string): Promise<void> {
+    await OracleConnectionManager.defaultInstance.connect(configPath);
+  }
+
+  public static async close(): Promise<void> {
+    await OracleConnectionManager.defaultInstance.close();
   }
 }
 
@@ -163,6 +190,7 @@ export class OracleAppRepository implements IAppRepository {
       loginSuccessCookieName: row.LOGIN_SUCCESS_COOKIE_NAME,
       sessionInjectionRules: row.SESSION_INJECTION_RULES || undefined,
       userIdCookieName: row.USER_ID_COOKIE_NAME || undefined,
+      sessionCaptureHeaders: row.SESSION_CAPTURE_HEADERS || undefined,
       createdAt: row.CREATED_AT ? new Date(row.CREATED_AT) : undefined,
       updatedAt: row.UPDATED_AT ? new Date(row.UPDATED_AT) : undefined
     };
@@ -184,7 +212,7 @@ export class OracleAppRepository implements IAppRepository {
     const query = `
       SELECT 
         a.APP_ID, a.APP_KEY, a.DISPLAY_NAME, a.AUTH_TYPE, a.STATUS, a.CREATED_AT, a.UPDATED_AT, a.DOMAIN_ID,
-        c.BASE_URL, c.LOGIN_URL, c.LOGIN_SUCCESS_URL_PATTERN, c.LOGIN_SUCCESS_COOKIE_NAME, c.SESSION_INJECTION_RULES, c.USER_ID_COOKIE_NAME
+        c.BASE_URL, c.LOGIN_URL, c.LOGIN_SUCCESS_URL_PATTERN, c.LOGIN_SUCCESS_COOKIE_NAME, c.SESSION_INJECTION_RULES, c.USER_ID_COOKIE_NAME, c.SESSION_CAPTURE_HEADERS
       FROM PG_APPLICATION a
       LEFT JOIN PG_APP_ACCESS_CHANNEL c ON a.APP_ID = c.APP_ID AND c.CHANNEL_TYPE = 'CUSTOMER'
       WHERE a.APP_KEY = :appKey
@@ -200,7 +228,7 @@ export class OracleAppRepository implements IAppRepository {
     const query = `
       SELECT 
         a.APP_ID, a.APP_KEY, a.DISPLAY_NAME, a.AUTH_TYPE, a.STATUS, a.CREATED_AT, a.UPDATED_AT, a.DOMAIN_ID,
-        c.BASE_URL, c.LOGIN_URL, c.LOGIN_SUCCESS_URL_PATTERN, c.LOGIN_SUCCESS_COOKIE_NAME, c.SESSION_INJECTION_RULES, c.USER_ID_COOKIE_NAME
+        c.BASE_URL, c.LOGIN_URL, c.LOGIN_SUCCESS_URL_PATTERN, c.LOGIN_SUCCESS_COOKIE_NAME, c.SESSION_INJECTION_RULES, c.USER_ID_COOKIE_NAME, c.SESSION_CAPTURE_HEADERS
       FROM PG_APPLICATION a
       LEFT JOIN PG_APP_ACCESS_CHANNEL c ON a.APP_ID = c.APP_ID AND c.CHANNEL_TYPE = 'CUSTOMER'
       ORDER BY a.APP_ID ASC
@@ -258,10 +286,11 @@ export class OracleAppRepository implements IAppRepository {
           LOGIN_SUCCESS_COOKIE_NAME = :loginSuccessCookieName,
           SESSION_INJECTION_RULES = :sessionInjectionRules,
           USER_ID_COOKIE_NAME = :userIdCookieName,
+          SESSION_CAPTURE_HEADERS = :sessionCaptureHeaders,
           UPDATED_AT = SYSTIMESTAMP
       WHEN NOT MATCHED THEN
-        INSERT (APP_ID, CHANNEL_TYPE, BASE_URL, LOGIN_URL, LOGIN_SUCCESS_URL_PATTERN, LOGIN_SUCCESS_COOKIE_NAME, SESSION_INJECTION_RULES, USER_ID_COOKIE_NAME, CREATED_AT, UPDATED_AT)
-        VALUES (src.APP_ID, src.CHANNEL_TYPE, :baseUrl, :loginUrl, :loginSuccessUrlPattern, :loginSuccessCookieName, :sessionInjectionRules, :userIdCookieName, SYSTIMESTAMP, SYSTIMESTAMP)
+        INSERT (APP_ID, CHANNEL_TYPE, BASE_URL, LOGIN_URL, LOGIN_SUCCESS_URL_PATTERN, LOGIN_SUCCESS_COOKIE_NAME, SESSION_INJECTION_RULES, USER_ID_COOKIE_NAME, SESSION_CAPTURE_HEADERS, CREATED_AT, UPDATED_AT)
+        VALUES (src.APP_ID, src.CHANNEL_TYPE, :baseUrl, :loginUrl, :loginSuccessUrlPattern, :loginSuccessCookieName, :sessionInjectionRules, :userIdCookieName, :sessionCaptureHeaders, SYSTIMESTAMP, SYSTIMESTAMP)
     `;
     await OracleConnectionManager.execute(mergeChannelQuery, {
       appId: reloaded.id,
@@ -270,7 +299,8 @@ export class OracleAppRepository implements IAppRepository {
       loginSuccessUrlPattern: app.loginSuccessUrlPattern || null,
       loginSuccessCookieName: app.loginSuccessCookieName || null,
       sessionInjectionRules: app.sessionInjectionRules || null,
-      userIdCookieName: app.userIdCookieName || null
+      userIdCookieName: app.userIdCookieName || null,
+      sessionCaptureHeaders: app.sessionCaptureHeaders || null
     });
 
     const finalReload = await this.findByKey(app.appKey);
@@ -382,6 +412,15 @@ export class OracleSessionRepository implements ISessionRepository {
   public async invalidate(sessionId: number): Promise<void> {
     const updateQuery = "UPDATE PG_SESSION_CREDENTIAL SET IS_ACTIVE = 0 WHERE SESSION_ID = :sessionId";
     await OracleConnectionManager.execute(updateQuery, { sessionId });
+  }
+
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    const deleteQuery = `
+      DELETE FROM PG_SESSION_CREDENTIAL 
+      WHERE IS_ACTIVE = 0 
+        AND IDENTITY_ID IN (SELECT IDENTITY_ID FROM PG_USER_IDENTITY WHERE APP_ID = :appId)
+    `;
+    await OracleConnectionManager.execute(deleteQuery, { appId });
   }
 }
 

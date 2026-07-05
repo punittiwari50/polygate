@@ -1,0 +1,34 @@
+endpoint:
+  app: kite
+  name: get_oms_gtt_triggers
+  path: /oms/gtt/triggers
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/orders/gtt
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items: {}
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data: []
+  description: Captured API Endpoint for kite.

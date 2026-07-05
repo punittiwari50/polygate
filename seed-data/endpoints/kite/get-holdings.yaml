@@ -1,0 +1,20 @@
+endpoint:
+  app: kite
+  name: getHoldings
+  path: /oms/portfolio/holdings
+  method: GET
+  requiresAuth: true
+  responseBody:
+    type: object
+    properties:
+      status: { type: string }
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            tradingsymbol: { type: string }
+            exchange: { type: string }
+            quantity: { type: number }
+            average_price: { type: number }
+  description: Retrieve user portfolio stock holdings.

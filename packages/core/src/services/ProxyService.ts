@@ -4,7 +4,7 @@ import { SessionService } from "@/services/SessionService.js";
 import { EndpointService } from "@/services/EndpointService.js";
 import { AuditLogService } from "@/services/AuditLogService.js";
 import { EndpointDefinition } from "@/entities/EndpointDefinition.js";
-import { Application, USER_ID_FALLBACK_NAMES } from "@/entities/Application.js";
+import { Application, USER_ID_FALLBACK_NAMES, matchesCaptureHeaders } from "@/entities/Application.js";
 
 export interface ProxyRequest {
   method: string;
@@ -138,6 +138,20 @@ const ruleStrategies: Record<string, IRuleInjectionStrategy> = {
   header: new HeaderRuleStrategy()
 };
 
+function interpolateValue(val: string): string {
+  if (typeof val !== "string") return val;
+  let resolved = val;
+  if (resolved.startsWith("env:")) {
+    const varName = resolved.substring(4).trim();
+    return process.env[varName] || "";
+  }
+  const regex = /\${([A-Za-z0-9_]+)}/g;
+  resolved = resolved.replace(regex, (_, varName) => {
+    return process.env[varName] || "";
+  });
+  return resolved;
+}
+
 @injectable()
 export class ProxyService {
   constructor(
@@ -172,29 +186,58 @@ export class ProxyService {
       this.matchPath(e.path, req.path)
     );
 
-    // 2. Validate request body against schema if defined
-    if (matchedEndpoint?.requestBodySchema && req.body) {
-      const valError = this.validateJsonSchema(req.body, matchedEndpoint.requestBodySchema);
-      if (valError) {
-        await this.auditLogService.logAction("PROXY", {
-          appId: app.id,
-          endpointId: matchedEndpoint.id,
-          statusCode: 400,
-          detail: `Request body validation failed: ${valError}`
-        });
-        return {
-          statusCode: 400,
-          headers: { "content-type": "application/json" },
-          body: Buffer.from(JSON.stringify({ error: `Request validation failed: ${valError}` }))
-        };
+    // 2. Validate mandatory headers and request body against schema if defined
+    const missingHeaders: string[] = [];
+    if (matchedEndpoint?.requestHeaders) {
+      for (const [headerName, expectedVal] of Object.entries(matchedEndpoint.requestHeaders)) {
+        if (expectedVal && expectedVal.toLowerCase() === "required") {
+          const hasHeader = Object.keys(req.headers).some(
+            h => h.toLowerCase() === headerName.toLowerCase()
+          );
+          if (!hasHeader) {
+            missingHeaders.push(headerName);
+          }
+        }
       }
+    }
+
+    let bodyValidationError: string | null = null;
+    if (matchedEndpoint?.requestBodySchema) {
+      const bodyToValidate = req.body || {};
+      bodyValidationError = this.validateJsonSchema(bodyToValidate, matchedEndpoint.requestBodySchema);
+    }
+
+    if (missingHeaders.length > 0 || bodyValidationError) {
+      const errors: string[] = [];
+      if (missingHeaders.length > 0) {
+        errors.push(`Missing required header fields: ${missingHeaders.join(", ")}`);
+      }
+      if (bodyValidationError) {
+        errors.push(`Request validation failed: ${bodyValidationError}`);
+      }
+      const errorMsg = errors.join("; ");
+
+      console.error(`Validation Error for endpoint [${req.method}] ${req.path}: ${errorMsg}`);
+
+      await this.auditLogService.logAction("PROXY", {
+        appId: app.id,
+        endpointId: matchedEndpoint?.id,
+        statusCode: 400,
+        detail: errorMsg
+      });
+
+      return {
+        statusCode: 400,
+        headers: { "content-type": "application/json" },
+        body: Buffer.from(JSON.stringify({ error: errorMsg }))
+      };
     }
 
     // Normalize all incoming header keys to lowercase to prevent duplicates or capitalization mismatches
     const finalHeaders: Record<string, string> = {};
     for (const [key, value] of Object.entries(req.headers)) {
       if (value !== undefined) {
-        finalHeaders[key.toLowerCase()] = value;
+        finalHeaders[key.toLowerCase()] = interpolateValue(value);
       }
     }
 
@@ -215,7 +258,9 @@ export class ProxyService {
     if (session) {
       // Inject session headers
       for (const [key, value] of Object.entries(session.headers)) {
-        finalHeaders[key.toLowerCase()] = value;
+        if (matchesCaptureHeaders(key, app.sessionCaptureHeaders)) {
+          finalHeaders[key.toLowerCase()] = value;
+        }
       }
 
       // Inject cookie header
@@ -265,15 +310,17 @@ export class ProxyService {
     }
     const cleanBaseUrl = normalizedBaseUrl.replace(/\/$/, "");
     const cleanPath = req.path.startsWith("/") ? req.path : `/${req.path}`;
-    const urlObj = new URL(`${cleanBaseUrl}${cleanPath}`);
+    const interpolatedBaseUrl = interpolateValue(cleanBaseUrl);
+    const interpolatedPath = interpolateValue(cleanPath);
+    const urlObj = new URL(`${interpolatedBaseUrl}${interpolatedPath}`);
     
     for (const [k, v] of Object.entries(req.queryParams)) {
       if (v !== undefined) {
-        urlObj.searchParams.append(k, String(v));
+        urlObj.searchParams.append(k, interpolateValue(String(v)));
       }
     }
 
-    const targetUrl = urlObj.toString();
+    const targetUrl = interpolateValue(urlObj.toString());
 
     // 5. Perform the request
     let response: Response;
@@ -285,7 +332,8 @@ export class ProxyService {
       };
 
       if (req.method !== "GET" && req.method !== "HEAD" && req.body !== undefined) {
-        fetchOpts.body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+        const rawBody = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+        fetchOpts.body = interpolateValue(rawBody);
       }
 
       response = await fetch(targetUrl, fetchOpts);

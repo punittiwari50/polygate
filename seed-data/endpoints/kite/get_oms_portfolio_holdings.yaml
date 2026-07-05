@@ -1,0 +1,220 @@
+endpoint:
+  app: kite
+  name: get_oms_portfolio_holdings
+  path: /oms/portfolio/holdings
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/holdings/equity
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            tradingsymbol:
+              type: string
+            exchange:
+              type: string
+            instrument_token:
+              type: integer
+            isin:
+              type: string
+            product:
+              type: string
+            price:
+              type: integer
+            quantity:
+              type: integer
+            used_quantity:
+              type: integer
+            t1_quantity:
+              type: integer
+            realised_quantity:
+              type: integer
+            authorised_quantity:
+              type: integer
+            authorised_date:
+              type: string
+            authorisation:
+              type: object
+              properties: {}
+            opening_quantity:
+              type: integer
+            short_quantity:
+              type: integer
+            collateral_quantity:
+              type: integer
+            collateral_type:
+              type: string
+            discrepancy:
+              type: boolean
+            average_price:
+              type: integer
+            last_price:
+              type: number
+            close_price:
+              type: integer
+            pnl:
+              type: number
+            day_change:
+              type: number
+            day_change_percentage:
+              type: number
+            mtf:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                used_quantity:
+                  type: integer
+                average_price:
+                  type: integer
+                value:
+                  type: integer
+                initial_margin:
+                  type: integer
+              required:
+                - quantity
+                - used_quantity
+                - average_price
+                - value
+                - initial_margin
+          required:
+            - tradingsymbol
+            - exchange
+            - instrument_token
+            - isin
+            - product
+            - price
+            - quantity
+            - used_quantity
+            - t1_quantity
+            - realised_quantity
+            - authorised_quantity
+            - authorised_date
+            - authorisation
+            - opening_quantity
+            - short_quantity
+            - collateral_quantity
+            - collateral_type
+            - discrepancy
+            - average_price
+            - last_price
+            - close_price
+            - pnl
+            - day_change
+            - day_change_percentage
+            - mtf
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - tradingsymbol: IML301025D
+        exchange: BSE
+        instrument_token: 240823044
+        isin: INE0BUS07CA1
+        product: CNC
+        price: 0
+        quantity: 250
+        used_quantity: 0
+        t1_quantity: 0
+        realised_quantity: 250
+        authorised_quantity: 0
+        authorised_date: '2026-07-04 00:00:00'
+        authorisation: {}
+        opening_quantity: 250
+        short_quantity: 0
+        collateral_quantity: 0
+        collateral_type: ''
+        discrepancy: true
+        average_price: 0
+        last_price: 995.05
+        close_price: 995
+        pnl: 248762.5
+        day_change: 0.049999999999954525
+        day_change_percentage: 0.0050251256281361335
+        mtf:
+          quantity: 0
+          used_quantity: 0
+          average_price: 0
+          value: 0
+          initial_margin: 0
+      - tradingsymbol: SGBMAY28-GB
+        exchange: NSE
+        instrument_token: 4856833
+        isin: IN0020200088
+        product: CNC
+        price: 0
+        quantity: 1
+        used_quantity: 0
+        t1_quantity: 0
+        realised_quantity: 1
+        authorised_quantity: 0
+        authorised_date: '2026-07-04 00:00:00'
+        authorisation: {}
+        opening_quantity: 1
+        short_quantity: 0
+        collateral_quantity: 0
+        collateral_type: ''
+        discrepancy: false
+        average_price: 4540
+        last_price: 14577.89
+        close_price: 14258.33
+        pnl: 10037.89
+        day_change: 319.5599999999995
+        day_change_percentage: 2.24121618730945
+        mtf:
+          quantity: 0
+          used_quantity: 0
+          average_price: 0
+          value: 0
+          initial_margin: 0
+      - tradingsymbol: TATACAP
+        exchange: NSE
+        instrument_token: 194371841
+        isin: INE976I01016
+        product: CNC
+        price: 0
+        quantity: 46
+        used_quantity: 0
+        t1_quantity: 0
+        realised_quantity: 46
+        authorised_quantity: 0
+        authorised_date: '2026-07-04 00:00:00'
+        authorisation: {}
+        opening_quantity: 46
+        short_quantity: 0
+        collateral_quantity: 0
+        collateral_type: ''
+        discrepancy: false
+        average_price: 326
+        last_price: 349.4
+        close_price: 356.3
+        pnl: 1076.399999999999
+        day_change: -6.900000000000034
+        day_change_percentage: -1.9365703059219852
+        mtf:
+          quantity: 0
+          used_quantity: 0
+          average_price: 0
+          value: 0
+          initial_margin: 0
+  description: Captured API Endpoint for kite.

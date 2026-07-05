@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { chromium, Page, Response, WebSocket } from "playwright";
 import yaml from "js-yaml";
-import { Application, EndpointDefinition } from "@polygate/core";
+import { Application, EndpointDefinition, matchesCaptureHeaders, DEFAULT_AUTH_TYPE, DEFAULT_APPLICATION_STATUS } from "@polygate/core";
 import { SchemaGenerator } from "@/recorder/SchemaGenerator.js";
 import { AssetDownloader } from "@/recorder/AssetDownloader.js";
 import { SqlGeneratorFactory } from "@/recorder/SqlGeneratorFactory.js";
@@ -154,13 +154,29 @@ export class PlaywrightRecorder {
       const reqBodySchema = reqBodyJson ? SchemaGenerator.infer(reqBodyJson) : undefined;
       const responseBodySchema = resBodyJson ? SchemaGenerator.infer(resBodyJson) : undefined;
 
+      const appConfig = this.getExistingAppConfig();
+      const capturePattern = appConfig?.sessionCaptureHeaders || "authorization,x-*";
+      const filteredHeaders: Record<string, string> = {};
+      for (const [key, value] of Object.entries(headers)) {
+        const lowerKey = key.toLowerCase();
+        const isCustomOrAuth = lowerKey.startsWith("x-") || lowerKey === "authorization";
+        const matchesCapture = matchesCaptureHeaders(key, capturePattern);
+        const headerValue = !isCustomOrAuth
+          ? value
+          : (matchesCapture ? "required" : undefined);
+
+        if (headerValue !== undefined) {
+          filteredHeaders[key] = headerValue;
+        }
+      }
+
       const ep: EndpointDefinition = {
         appId: 0, // placeholder updated during database insert or save
         name: endpointName,
         path: endpointPath,
         httpMethod: method as any,
         requiresAuth: true,
-        requestHeaders: headers,
+        requestHeaders: filteredHeaders,
         requestBodySchema: reqBodySchema,
         responseBodySchema,
         sampleResponse: resBodyJson,
@@ -239,6 +255,35 @@ export class PlaywrightRecorder {
     }
   }
 
+  private getExistingAppConfig(): Application | null {
+    try {
+      const seedDir = this.getSeedDir();
+      const appYamlPath = path.join(seedDir, "apps", `${this.appKey}.yaml`);
+      if (fs.existsSync(appYamlPath)) {
+        const content = fs.readFileSync(appYamlPath, "utf8");
+        const doc = yaml.load(content) as any;
+        if (doc && doc.app) {
+          return {
+            appKey: this.appKey,
+            displayName: doc.app.displayName || this.appKey,
+            baseUrl: doc.app.baseUrl,
+            loginUrl: doc.app.loginUrl,
+            authType: doc.app.authType || DEFAULT_AUTH_TYPE,
+            status: doc.app.status || DEFAULT_APPLICATION_STATUS,
+            loginSuccessUrlPattern: doc.app.loginSuccessUrlPattern,
+            loginSuccessCookieName: doc.app.loginSuccessCookieName,
+            sessionInjectionRules: doc.app.sessionInjectionRules,
+            userIdCookieName: doc.app.userIdCookieName,
+            sessionCaptureHeaders: doc.app.sessionCaptureHeaders
+          };
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
   /**
    * Helper to write all captured configurations to files.
    */
@@ -246,13 +291,20 @@ export class PlaywrightRecorder {
     const seedDir = this.getSeedDir();
     console.log(`\nFinalizing recording files under: ${seedDir}`);
 
+    const existingApp = this.getExistingAppConfig();
+
     const appObj: Application = {
       appKey: this.appKey,
-      displayName: `${this.appKey.toUpperCase()} Captured Application`,
-      baseUrl: new URL(this.initialUrl).origin,
-      loginUrl: this.initialUrl,
-      authType: "NONE",
-      status: "ACTIVE"
+      displayName: existingApp?.displayName || `${this.appKey.toUpperCase()} Captured Application`,
+      baseUrl: existingApp?.baseUrl || new URL(this.initialUrl).origin,
+      loginUrl: existingApp?.loginUrl || this.initialUrl,
+      authType: existingApp?.authType || DEFAULT_AUTH_TYPE,
+      status: existingApp?.status || DEFAULT_APPLICATION_STATUS,
+      loginSuccessUrlPattern: existingApp?.loginSuccessUrlPattern,
+      loginSuccessCookieName: existingApp?.loginSuccessCookieName,
+      sessionInjectionRules: existingApp?.sessionInjectionRules,
+      userIdCookieName: existingApp?.userIdCookieName,
+      sessionCaptureHeaders: existingApp?.sessionCaptureHeaders || "authorization,x-*"
     };
 
     // 1. Write Application YAML
@@ -392,6 +444,9 @@ export class PlaywrightRecorder {
   }
 
   private getSeedDir(): string {
+    if (process.env.SEED_DIR) {
+      return process.env.SEED_DIR;
+    }
     let current = process.cwd();
     while (true) {
       const hasWorkspace = fs.existsSync(path.join(current, "pnpm-workspace.yaml"));

@@ -6,7 +6,9 @@ import {
   IAppRepository,
   ISessionRepository,
   IEndpointRepository,
-  IAuditLogRepository
+  IAuditLogRepository,
+  AUTH_TYPES,
+  APPLICATION_STATUSES
 } from "@polygate/core";
 
 export class MemoryAppRepository implements IAppRepository {
@@ -28,10 +30,10 @@ export class MemoryAppRepository implements IAppRepository {
 
   public async upsert(app: Application): Promise<Application> {
     // Validate constraint
-    if (app.authType && !["OAUTH", "BASIC", "API_KEY", "NONE"].includes(app.authType)) {
+    if (app.authType && !(AUTH_TYPES as readonly string[]).includes(app.authType)) {
       throw new Error(`Invalid authType: ${app.authType}`);
     }
-    if (app.status && !["ACTIVE", "DISABLED"].includes(app.status)) {
+    if (app.status && !(APPLICATION_STATUSES as readonly string[]).includes(app.status)) {
       throw new Error(`Invalid status: ${app.status}`);
     }
 
@@ -99,6 +101,14 @@ export class MemorySessionRepository implements ISessionRepository {
     const session = MemorySessionRepository.sessions.get(sessionId);
     if (session) {
       session.isActive = false;
+    }
+  }
+
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    for (const [id, session] of MemorySessionRepository.sessions.entries()) {
+      if (session.appId === appId && !session.isActive) {
+        MemorySessionRepository.sessions.delete(id);
+      }
     }
   }
 

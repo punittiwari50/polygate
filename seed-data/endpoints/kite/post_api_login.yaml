@@ -1,0 +1,77 @@
+endpoint:
+  app: kite
+  name: post_api_login
+  path: /api/login
+  method: POST
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    referer: https://kite.zerodha.com/
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+    content-type: application/x-www-form-urlencoded
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: object
+        properties:
+          user_id:
+            type: string
+          request_id:
+            type: string
+          twofa_type:
+            type: string
+          twofa_types:
+            type: array
+            items:
+              type: string
+          twofa_status:
+            type: string
+          profile:
+            type: object
+            properties:
+              user_name:
+                type: string
+              user_shortname:
+                type: string
+              avatar_url:
+                type: 'null'
+            required:
+              - user_name
+              - user_shortname
+              - avatar_url
+        required:
+          - user_id
+          - request_id
+          - twofa_type
+          - twofa_types
+          - twofa_status
+          - profile
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      user_id: <userId>
+      request_id: <requestId>
+      twofa_type: totp
+      twofa_types:
+        - totp
+        - app_code
+      twofa_status: active
+      profile:
+        user_name: John Doe
+        user_shortname: John
+        avatar_url: null
+  description: Captured API Endpoint for kite.

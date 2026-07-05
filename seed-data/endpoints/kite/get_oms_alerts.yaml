@@ -1,0 +1,109 @@
+endpoint:
+  app: kite
+  name: get_oms_alerts
+  path: /oms/alerts
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/orders/alerts
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            user_id:
+              type: string
+            uuid:
+              type: string
+            name:
+              type: string
+            status:
+              type: string
+            disabled_reason:
+              type: string
+            lhs_attribute:
+              type: string
+            lhs_exchange:
+              type: string
+            lhs_tradingsymbol:
+              type: string
+            operator:
+              type: string
+            rhs_type:
+              type: string
+            rhs_attribute:
+              type: string
+            rhs_exchange:
+              type: string
+            rhs_tradingsymbol:
+              type: string
+            rhs_constant:
+              type: integer
+            alert_count:
+              type: integer
+            created_at:
+              type: string
+            updated_at:
+              type: string
+          required:
+            - type
+            - user_id
+            - uuid
+            - name
+            - status
+            - disabled_reason
+            - lhs_attribute
+            - lhs_exchange
+            - lhs_tradingsymbol
+            - operator
+            - rhs_type
+            - rhs_attribute
+            - rhs_exchange
+            - rhs_tradingsymbol
+            - rhs_constant
+            - alert_count
+            - created_at
+            - updated_at
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - type: simple
+        user_id: <userId>
+        uuid: b2309356-ce54-4d42-b18c-ca69cc026c44
+        name: NIFTY 50
+        status: disabled
+        disabled_reason: ''
+        lhs_attribute: LastTradedPrice
+        lhs_exchange: INDICES
+        lhs_tradingsymbol: NIFTY 50
+        operator: '>='
+        rhs_type: constant
+        rhs_attribute: ''
+        rhs_exchange: ''
+        rhs_tradingsymbol: ''
+        rhs_constant: 24000
+        alert_count: 1
+        created_at: '2026-05-27 23:56:59'
+        updated_at: '2026-06-15 09:15:03'
+  description: Captured API Endpoint for kite.

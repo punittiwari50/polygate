@@ -1,0 +1,98 @@
+endpoint:
+  app: kite
+  name: get_oms_bulletins
+  path: /oms/bulletins
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/dashboard
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            uuid:
+              type: string
+            priority:
+              type: string
+            status:
+              type: string
+            scopes:
+              type: array
+              items:
+                type: string
+            channels:
+              type: array
+              items:
+                type: string
+            content:
+              type: string
+            is_sticky:
+              type: boolean
+            created_at:
+              type: string
+            expires_at:
+              type: string
+          required:
+            - uuid
+            - priority
+            - status
+            - scopes
+            - channels
+            - content
+            - is_sticky
+            - created_at
+            - expires_at
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - uuid: ddee0aa1-75ed-11f1-9860-d3d9de22f971
+        priority: medium
+        status: unread
+        scopes:
+          - '*'
+        channels:
+          - coinmobile
+        content: >-
+          Introducing Zerodha Life Cycle funds. These are mutual funds with
+          diversified portfolios of equity, debt, and gold that automatically
+          reduce risk as the target year gets closer. [Invest in
+          NFO](coin://nfo).
+        is_sticky: true
+        created_at: '2026-07-02T08:13:11.626Z'
+        expires_at: '0001-01-01 00:00:00'
+      - uuid: f3ecaff1-75ed-11f1-9860-d3d9de22f971
+        priority: medium
+        status: unread
+        scopes:
+          - '*'
+        channels:
+          - coinweb
+        content: >-
+          Introducing Zerodha Life Cycle funds. These are mutual funds with
+          diversified portfolios of equity, debt, and gold that automatically
+          reduce risk as the target year gets closer. [Invest in
+          NFO](https://coin.zerodha.com/mf/invest?nfo=show).
+        is_sticky: true
+        created_at: '2026-07-02T08:13:48.527Z'
+        expires_at: '0001-01-01 00:00:00'
+  description: Captured API Endpoint for kite.

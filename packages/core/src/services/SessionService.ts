@@ -204,4 +204,22 @@ export class SessionService {
       detail: `Session ID ${sessionId} invalidated.`
     });
   }
+
+  /**
+   * Permanently deletes inactive (soft-deleted/expired) session credentials for the given app key.
+   */
+  public async deleteInactiveSessions(appKey: string): Promise<void> {
+    const app = await this.appRepo.findByKey(appKey);
+    if (!app || !app.id) {
+      throw new Error(`Application with key ${appKey} not found.`);
+    }
+
+    await this.sessionRepo.deleteInactiveSessions(app.id);
+
+    await this.auditLogService.logAction("LOGOUT", {
+      appId: app.id,
+      statusCode: 200,
+      detail: `All inactive sessions cleared from persistence storage.`
+    });
+  }
 }

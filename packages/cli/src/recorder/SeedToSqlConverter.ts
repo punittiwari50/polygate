@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import yaml from "js-yaml";
-import { Application, EndpointDefinition } from "@polygate/core";
+import { Application, EndpointDefinition, DEFAULT_AUTH_TYPE, DEFAULT_APPLICATION_STATUS } from "@polygate/core";
 import { SqlGeneratorFactory } from "@/recorder/SqlGeneratorFactory.js";
 import { WebsocketDefinition, AssetDefinition } from "@/recorder/SqlDialectGenerator.js";
 import { Validator } from "@/recorder/Validator.js";
@@ -33,12 +33,13 @@ export class SeedToSqlConverter {
             displayName: doc.app.displayName || appKey,
             baseUrl: doc.app.baseUrl,
             loginUrl: doc.app.loginUrl,
-            authType: doc.app.authType || "NONE",
-            status: doc.app.status || "ACTIVE",
+            authType: doc.app.authType || DEFAULT_AUTH_TYPE,
+            status: doc.app.status || DEFAULT_APPLICATION_STATUS,
             loginSuccessUrlPattern: doc.app.loginSuccessUrlPattern,
             loginSuccessCookieName: doc.app.loginSuccessCookieName,
             sessionInjectionRules: doc.app.sessionInjectionRules,
-            userIdCookieName: doc.app.userIdCookieName
+            userIdCookieName: doc.app.userIdCookieName,
+            sessionCaptureHeaders: doc.app.sessionCaptureHeaders
           };
           sqlStatements.push(generator.generateApplicationInsert(appObj));
           sqlStatements.push("");

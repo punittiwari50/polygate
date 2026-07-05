@@ -9,7 +9,9 @@ import {
   IAppRepository,
   ISessionRepository,
   IEndpointRepository,
-  IAuditLogRepository
+  IAuditLogRepository,
+  DEFAULT_AUTH_TYPE,
+  DEFAULT_APPLICATION_STATUS
 } from "@polygate/core";
 
 export class YamlHelper {
@@ -112,8 +114,8 @@ export class YamlAppRepository implements IAppRepository {
               baseUrl: doc.app.baseUrl,
               loginUrl: doc.app.loginUrl,
               domainId: doc.app.domainId,
-              authType: doc.app.authType || "NONE",
-              status: doc.app.status || "ACTIVE",
+              authType: doc.app.authType || DEFAULT_AUTH_TYPE,
+              status: doc.app.status || DEFAULT_APPLICATION_STATUS,
               loginSuccessUrlPattern: doc.app.loginSuccessUrlPattern,
               loginSuccessCookieName: doc.app.loginSuccessCookieName,
               sessionInjectionRules: doc.app.sessionInjectionRules
@@ -122,6 +124,7 @@ export class YamlAppRepository implements IAppRepository {
                     : doc.app.sessionInjectionRules)
                 : undefined,
               userIdCookieName: doc.app.userIdCookieName,
+              sessionCaptureHeaders: doc.app.sessionCaptureHeaders,
               createdAt: doc.app.createdAt ? new Date(doc.app.createdAt) : new Date(),
               updatedAt: doc.app.updatedAt ? new Date(doc.app.updatedAt) : new Date()
             };
@@ -183,6 +186,7 @@ export class YamlAppRepository implements IAppRepository {
         loginSuccessCookieName: app.loginSuccessCookieName,
         sessionInjectionRules: rulesObj,
         userIdCookieName: app.userIdCookieName,
+        sessionCaptureHeaders: app.sessionCaptureHeaders,
         createdAt: app.createdAt ? new Date(app.createdAt).toISOString() : new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -269,6 +273,12 @@ export class YamlSessionRepository implements ISessionRepository {
       session.isActive = false;
       this.saveSessions(sessions);
     }
+  }
+
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    const sessions = this.loadSessions();
+    const filtered = sessions.filter(s => !(s.appId === appId && !s.isActive));
+    this.saveSessions(filtered);
   }
 }
 

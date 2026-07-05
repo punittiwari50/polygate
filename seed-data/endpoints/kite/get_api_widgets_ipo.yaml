@@ -1,0 +1,309 @@
+endpoint:
+  app: kite
+  name: get_api_widgets_ipo
+  path: /api/widgets/ipo
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    x-csrftoken: <csrfToken>
+    referer: https://kite.zerodha.com/dashboard
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            tradingsymbol:
+              type: string
+            name:
+              type: string
+            start_date:
+              type: string
+            type:
+              type: string
+            end_date:
+              type: string
+            listing_date:
+              type: string
+            url:
+              type: string
+            thumb:
+              type: string
+            upcoming:
+              type: boolean
+            live:
+              type: boolean
+            closed:
+              type: boolean
+          required:
+            - tradingsymbol
+            - name
+            - start_date
+            - type
+            - end_date
+            - listing_date
+            - url
+            - thumb
+            - upcoming
+            - live
+            - closed
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - tradingsymbol: KNACK
+        name: Knack Packaging
+        start_date: '2026-07-01T00:00:00+05:30'
+        type: Mainboard
+        end_date: '2026-07-03T16:30:00+05:30'
+        listing_date: '2026-07-08T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451369/knack-packaging
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/knack_packaging_logo-300x300.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: TEJA
+        name: Teja Engineering Industries
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451376/teja-engineering-industries
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/teja_engineering_logo-300x300.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: ATHARVA
+        name: Atharva Poly-Plast
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451003/atharva-polyplast
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/atharva_polyplast_logo-300x300.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: SEEMAX
+        name: Seemax Resources
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451379/seemax-resources
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/seemax_logo-300x300.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: SILL
+        name: Sampark India Logistics
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451125/sampark-india-logistics
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/Sampark_logo-300x132.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: VMOBILE
+        name: Vinit Mobile
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451384/vinit-mobile
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/01/vinit_mobile_logo-300x300.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: KRATIKAL
+        name: Kratikal Tech
+        start_date: '2026-06-30T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-02T16:30:00+05:30'
+        listing_date: '2026-07-07T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451129/kratikal-tech
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/Kratikal_logo-300x158.png
+        upcoming: false
+        live: false
+        closed: true
+      - tradingsymbol: ICELCO
+        name: IC Electricals Company
+        start_date: '2026-07-03T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-07T16:30:00+05:30'
+        listing_date: '2026-07-10T00:00:00+05:30'
+        url: https://zerodha.com/ipo//450895/ic-electricals-company
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/ie_logo-300x300.png
+        upcoming: false
+        live: true
+        closed: false
+      - tradingsymbol: KUSUMGAR
+        name: Kusumgar
+        start_date: '2026-07-10T00:00:00+05:30'
+        type: Mainboard
+        end_date: '2026-07-10T16:30:00+05:30'
+        listing_date: '2026-07-15T00:00:00+05:30'
+        url: https://zerodha.com/ipo//439451/kusumgar
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/01/kusumgar_logo-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: DEVSON
+        name: Devson Catalyst
+        start_date: '2026-07-09T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-13T16:30:00+05:30'
+        listing_date: '2026-07-16T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451799/devson-catalyst
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2026/06/Devson_logo-300x225.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: HSTEEL
+        name: Happy Steels
+        start_date: '2026-07-09T00:00:00+05:30'
+        type: SME
+        end_date: '2026-07-13T16:30:00+05:30'
+        listing_date: '2026-07-16T00:00:00+05:30'
+        url: https://zerodha.com/ipo//451927/happy-steels
+        thumb: ''
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: NSE
+        name: NSE
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//411840/national-stock-exchange
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/04/nselogo-300x166.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: JIO
+        name: Reliance Jio
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//436988/reliance-jio
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/12/jio_logo-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: ACKO
+        name: Acko
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//447335/acko
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/12/acko_logo-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: OYO
+        name: OYO
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//307026/oyo-oravel-stays-limited
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2024/05/oyo-300x300.jpeg
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: PARLE
+        name: Parle Products
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//447344/parle-products
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/12/parle_logo-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: MAKEMYTRIP
+        name: MakeMyTrip
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//444843/makemytrip
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/12/makemytrip_logo-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: BOAT
+        name: BOAT
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//390366/boat
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2024/09/boAt-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: ZEPTO
+        name: Zepto
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//391072/zepto
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2024/09/Zepto-IPO-300x300.png
+        upcoming: true
+        live: false
+        closed: false
+      - tradingsymbol: SBIMF
+        name: SBI Mutual Fund
+        start_date: null
+        type: Mainboard
+        end_date: null
+        listing_date: null
+        url: https://zerodha.com/ipo//410574/sbi-mutual-fund
+        thumb: >-
+          https://zerodha.com/z-connect/wp-content/uploads/2025/04/SBIMF_IPO-300x300.jpg
+        upcoming: true
+        live: false
+        closed: false
+  description: Captured API Endpoint for kite.

@@ -14,14 +14,26 @@ import {
   OracleAppRepository,
   OracleSessionRepository,
   OracleEndpointRepository,
-  OracleAuditLogRepository
+  OracleAuditLogRepository,
+  OracleConnectionManager
 } from "@/oracle/OracleRepositories.js";
+import { PersistenceAdapter } from "@/index.js";
 
-export class OraclePersistenceAdapter {
+export class OraclePersistenceAdapter implements PersistenceAdapter {
   public appRepository = new OracleAppRepository();
   public sessionRepository = new OracleSessionRepository();
   public endpointRepository = new OracleEndpointRepository();
   public auditLogRepository = new OracleAuditLogRepository();
+
+  public readonly connectionManager = new OracleConnectionManager();
+
+  public async connect(configPath?: string): Promise<void> {
+    await this.connectionManager.connect(configPath);
+  }
+
+  public async close(): Promise<void> {
+    await this.connectionManager.close();
+  }
 }
 
 export default OraclePersistenceAdapter;

@@ -1,0 +1,335 @@
+endpoint:
+  app: kite
+  name: get_api_marketwatch_id_items
+  path: /api/marketwatch/:id/items
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    x-csrftoken: <csrfToken>
+    referer: https://kite.zerodha.com/dashboard
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          groups:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                weight:
+                  type: integer
+                color:
+                  type: 'null'
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      weight:
+                        type: integer
+                      note:
+                        type: 'null'
+                      tradingsymbol:
+                        type: string
+                      instrument_token:
+                        type: integer
+                      segment:
+                        type: string
+                      exchange:
+                        type: string
+                      expiry:
+                        type: string
+                    required:
+                      - id
+                      - weight
+                      - note
+                      - tradingsymbol
+                      - instrument_token
+                      - segment
+                      - exchange
+                      - expiry
+              required:
+                - id
+                - name
+                - weight
+                - color
+                - items
+          weight:
+            type: integer
+          is_static:
+            type: boolean
+          static_id:
+            type: 'null'
+        required:
+          - id
+          - name
+          - groups
+          - weight
+          - is_static
+          - static_id
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      id: 1
+      name: 😉😇🤑
+      groups:
+        - id: GROUP:YTD4PKcw
+          name: Default
+          weight: 1
+          color: null
+          items:
+            - id: NSE:INE750C01026
+              weight: 2
+              note: null
+              tradingsymbol: MARKSANS
+              instrument_token: 2708225
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE628A01036
+              weight: 3
+              note: null
+              tradingsymbol: UPL
+              instrument_token: 2889473
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE154A01025
+              weight: 4
+              note: null
+              tradingsymbol: ITC
+              instrument_token: 424961
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE193E01025
+              weight: 5
+              note: null
+              tradingsymbol: BAJAJELEC
+              instrument_token: 3848705
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE053F01010
+              weight: 6
+              note: null
+              tradingsymbol: IRFC
+              instrument_token: 519425
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE155A01022
+              weight: 7
+              note: null
+              tradingsymbol: TMPV
+              instrument_token: 884737
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE530B01024
+              weight: 8
+              note: null
+              tradingsymbol: IIFL
+              instrument_token: 3023105
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE002A01018
+              weight: 9
+              note: null
+              tradingsymbol: RELIANCE
+              instrument_token: 738561
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE172A01027
+              weight: 10
+              note: null
+              tradingsymbol: CASTROLIND
+              instrument_token: 320001
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE0DD101019
+              weight: 11
+              note: null
+              tradingsymbol: RAILTEL
+              instrument_token: 622337
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE694N01015
+              weight: 12
+              note: null
+              tradingsymbol: HERANBA
+              instrument_token: 669185
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE528G01035
+              weight: 13
+              note: null
+              tradingsymbol: YESBANK
+              instrument_token: 3050241
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE101A01026
+              weight: 14
+              note: null
+              tradingsymbol: M&M
+              instrument_token: 519937
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE205A01025
+              weight: 15
+              note: null
+              tradingsymbol: VEDL
+              instrument_token: 784129
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE935N01020
+              weight: 16
+              note: null
+              tradingsymbol: DIXON
+              instrument_token: 5552641
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE209A01019
+              weight: 17
+              note: null
+              tradingsymbol: SUNDROP
+              instrument_token: 425729
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE114A01011
+              weight: 18
+              note: null
+              tradingsymbol: SAIL
+              instrument_token: 758529
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE257A01026
+              weight: 19
+              note: null
+              tradingsymbol: BHEL
+              instrument_token: 112129
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE733E01010
+              weight: 20
+              note: null
+              tradingsymbol: NTPC
+              instrument_token: 2977281
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE040A01034
+              weight: 21
+              note: null
+              tradingsymbol: HDFCBANK
+              instrument_token: 341249
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE467B01029
+              weight: 22
+              note: null
+              tradingsymbol: TCS
+              instrument_token: 2953217
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE475E01026
+              weight: 23
+              note: null
+              tradingsymbol: CAPLIPOINT
+              instrument_token: 999937
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE029A01011
+              weight: 24
+              note: null
+              tradingsymbol: BPCL
+              instrument_token: 134657
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE245A01021
+              weight: 25
+              note: null
+              tradingsymbol: TATAPOWER
+              instrument_token: 877057
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE0OWX01025
+              weight: 26
+              note: null
+              tradingsymbol: KEL-SM
+              instrument_token: 4789249
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE976I01016
+              weight: 27
+              note: null
+              tradingsymbol: TATACAP
+              instrument_token: 194371841
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE346A01027
+              weight: 28
+              note: null
+              tradingsymbol: ICICIAMC
+              instrument_token: 194664193
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+            - id: NSE:INE046A01015
+              weight: 28.0001
+              note: null
+              tradingsymbol: RIIL
+              instrument_token: 745473
+              segment: NSE
+              exchange: NSE
+              expiry: ''
+      weight: 1
+      is_static: false
+      static_id: null
+  description: Captured API Endpoint for kite.

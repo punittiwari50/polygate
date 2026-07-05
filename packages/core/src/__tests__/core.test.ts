@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { CryptoService } from "../services/CryptoService.js";
 import { SessionService } from "../services/SessionService.js";
-import { Application } from "../entities/Application.js";
+import { Application, matchesCaptureHeaders } from "../entities/Application.js";
 import { SessionCredential } from "../entities/SessionCredential.js";
 import { IAppRepository } from "../ports/IAppRepository.js";
 import { ISessionRepository } from "../ports/ISessionRepository.js";
@@ -49,8 +49,17 @@ class MockSessionRepository implements ISessionRepository {
     return Array.from(this.sessions.values()).filter(s => s.appId === appId);
   }
   public async invalidate(sessionId: number): Promise<void> {
-    const s = this.sessions.get(sessionId);
-    if (s) s.isActive = false;
+    const session = this.sessions.get(sessionId);
+    if (session) {
+      session.isActive = false;
+    }
+  }
+  public async deleteInactiveSessions(appId: number): Promise<void> {
+    for (const [id, session] of this.sessions.entries()) {
+      if (session.appId === appId && !session.isActive) {
+        this.sessions.delete(id);
+      }
+    }
   }
 }
 
@@ -189,5 +198,49 @@ describe("SessionService", () => {
     const activeByUuid = await sessionService.getActiveSession("kite", sessionUuid);
     expect(activeByUuid).not.toBeNull();
     expect(activeByUuid?.cookies[0].value).toBe("userUUIDTest");
+  });
+
+  it("should delete inactive sessions at service level", async () => {
+    // 1. Save two sessions (the second one will invalidate the first one if they share same user ID, or we can invalidate active one)
+    await sessionService.saveSession("kite", [{ name: "user_id", value: "userClean" }], {});
+    await sessionService.invalidateActiveSession("kite", "userClean");
+
+    // Save another session to keep active
+    await sessionService.saveSession("kite", [{ name: "user_id", value: "userActive" }], {});
+
+    // 2. Clear inactive sessions
+    await sessionService.deleteInactiveSessions("kite");
+
+    // 3. Verify
+    const sessions = await sessionService.listSessions("kite");
+    expect(sessions.find(s => s.userId === "userClean")).toBeUndefined();
+    expect(sessions.find(s => s.userId === "userActive")).toBeDefined();
+  });
+});
+
+describe("matchesCaptureHeaders", () => {
+  it("should match default headers when no pattern is provided", () => {
+    expect(matchesCaptureHeaders("authorization")).toBe(true);
+    expect(matchesCaptureHeaders("Authorization")).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-version")).toBe(true);
+    expect(matchesCaptureHeaders("x-custom")).toBe(true);
+    expect(matchesCaptureHeaders("host")).toBe(false);
+    expect(matchesCaptureHeaders("cookie")).toBe(false);
+  });
+
+  it("should match custom pattern exactly", () => {
+    const pattern = "authorization,x-kite-userid,x-kite-app-uuid";
+    expect(matchesCaptureHeaders("authorization", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-userid", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-app-uuid", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-version", pattern)).toBe(false);
+  });
+
+  it("should match custom pattern with wildcards", () => {
+    const pattern = "authorization,x-kite-*";
+    expect(matchesCaptureHeaders("authorization", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-userid", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-kite-version", pattern)).toBe(true);
+    expect(matchesCaptureHeaders("x-other", pattern)).toBe(false);
   });
 });

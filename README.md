@@ -397,3 +397,28 @@ Stop-Process -Name "node" -Force -ErrorAction SilentlyContinue
 Stop-Process -Name "npm" -Force -ErrorAction SilentlyContinue
 Stop-Process -Name "pnpm" -Force -ErrorAction SilentlyContinue
 ```
+
+---
+
+## Environment Setup (NPM_HOME)
+
+To ensure that the environment variables are correctly configured for package dependencies and runtimes, you can define `NPM_HOME` using the setup scripts located in the `scripts/` directory:
+
+### Bash / Zsh (Unix Shells)
+Run the shell script to export `NPM_HOME` and update your `$PATH` variables. You can optionally pass the path to node/npm if different from the default (`C:/DEV/WSB/BIN/NODE_NPM`):
+```bash
+./scripts/setup-npm-home.sh [/path/to/npm]
+```
+*Note: This script will attempt to persist the variables in `.bashrc` or `.profile` so they load automatically in new shells.*
+
+### PowerShell
+Run the PowerShell script to set the `NPM_HOME` User environment variable:
+```powershell
+.\scripts\setup-npm-home.ps1 [C:\path\to\npm]
+```
+
+### Windows Command Prompt (Batch)
+Run the batch script to permanently write `NPM_HOME` to your system registry:
+```cmd
+.\scripts\setup-npm-home.bat [C:\path\to\npm]
+```

@@ -1,0 +1,1485 @@
+endpoint:
+  app: kite
+  name: get_oms_ipo_instruments
+  path: /oms/ipo/instruments
+  method: GET
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    authorization: required
+    referer: https://kite.zerodha.com/bids/ipo
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            symbol:
+              type: string
+            active:
+              type: boolean
+            status:
+              type: string
+            registrar:
+              type: string
+            sub_type:
+              type: string
+            max_bid_count:
+              type: integer
+            name:
+              type: string
+            isin:
+              type: string
+            issue_type:
+              type: string
+            face_value:
+              type: integer
+            issue_size:
+              type: integer
+            tick_size:
+              type: integer
+            lot_size:
+              type: integer
+            min_qty:
+              type: integer
+            max_qty:
+              type: integer
+            start_at:
+              type: string
+            end_at:
+              type: string
+            created_at:
+              type: string
+            updated_at:
+              type: string
+            allotment_finalisation_date:
+              type: string
+            refund_initiation_date:
+              type: string
+            demat_transfer_date:
+              type: string
+            listing_date:
+              type: string
+            mandate_end_date:
+              type: string
+            rhp_link:
+              type: string
+            info:
+              type: string
+            bond_series:
+              type: array
+              items: {}
+            investor_types:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  description:
+                    type: string
+                  start_time:
+                    type: string
+                  end_time:
+                    type: string
+                  min_price:
+                    type: integer
+                  max_price:
+                    type: integer
+                  cutoff_price:
+                    type: integer
+                  cutoff_disabled:
+                    type: boolean
+                  restrict_downsize:
+                    type: boolean
+                  cancel_disabled:
+                    type: boolean
+                  discount_type:
+                    type: string
+                  discount_value:
+                    type: string
+                  discount_amount:
+                    type: integer
+                  asba_flag:
+                    type: string
+                  max_modification_limit:
+                    type: integer
+                  min_investment_amount:
+                    type: integer
+                  max_investment_amount:
+                    type: integer
+                required:
+                  - code
+                  - description
+                  - start_time
+                  - end_time
+                  - min_price
+                  - max_price
+                  - cutoff_price
+                  - cutoff_disabled
+                  - restrict_downsize
+                  - cancel_disabled
+                  - discount_type
+                  - discount_value
+                  - discount_amount
+                  - asba_flag
+                  - max_modification_limit
+                  - min_investment_amount
+                  - max_investment_amount
+            exchanges:
+              type: array
+              items:
+                type: string
+            orders:
+              type: 'null'
+          required:
+            - id
+            - symbol
+            - active
+            - status
+            - registrar
+            - sub_type
+            - max_bid_count
+            - name
+            - isin
+            - issue_type
+            - face_value
+            - issue_size
+            - tick_size
+            - lot_size
+            - min_qty
+            - max_qty
+            - start_at
+            - end_at
+            - created_at
+            - updated_at
+            - allotment_finalisation_date
+            - refund_initiation_date
+            - demat_transfer_date
+            - listing_date
+            - mandate_end_date
+            - rhp_link
+            - info
+            - bond_series
+            - investor_types
+            - exchanges
+            - orders
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      - id: f58c11c2-7537-11f1-91f2-57b935d93f50
+        symbol: ICELCO
+        active: true
+        status: ongoing
+        registrar: SKYLINE
+        sub_type: SME
+        max_bid_count: 1
+        name: IC Electricals Company
+        isin: INE0XE501015
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 4839600
+        tick_size: 1
+        lot_size: 1200
+        min_qty: 2400
+        max_qty: 0
+        start_at: '2026-07-03 10:00:00'
+        end_at: '2026-07-07 17:00:00'
+        created_at: '2026-07-01T16:01:02.84384+05:30'
+        updated_at: '2026-07-04T17:01:01.860193+05:30'
+        allotment_finalisation_date: '2026-07-08'
+        refund_initiation_date: '2026-07-09'
+        demat_transfer_date: '2026-07-09'
+        listing_date: '2026-07-10'
+        mandate_end_date: '2026-07-22'
+        rhp_link: https://zerodha.com/ipo/450895/ic-electricals-company/
+        info: >-
+          High risk: This stock will trade with a lot size of 1200 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 94
+            max_price: 99
+            cutoff_price: 99
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 225600
+            min_investment_amount: 225600
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 2a491e9e-6a59-11f1-91c9-57b935d93f50
+        symbol: TURTLEMINT
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: IPO
+        max_bid_count: 3
+        name: Turtlemint Fintech Solutions
+        isin: INE0OC301013
+        issue_type: BB
+        face_value: 0
+        issue_size: 60485318
+        tick_size: 1
+        lot_size: 98
+        min_qty: 98
+        max_qty: 15121302
+        start_at: '2026-06-19 10:00:00'
+        end_at: '2026-06-23 17:00:00'
+        created_at: '2026-06-17T20:01:01.925586+05:30'
+        updated_at: '2026-06-25T17:20:03.052292+05:30'
+        allotment_finalisation_date: '2026-06-24'
+        refund_initiation_date: '2026-06-25'
+        demat_transfer_date: '2026-06-25'
+        listing_date: '2026-06-29'
+        mandate_end_date: '2026-07-08'
+        rhp_link: https://zerodha.com/ipo/441283/turtlemint-fintech-solutions/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 144
+            max_price: 152
+            cutoff_price: 152
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 14112
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: f969a4d4-6bc9-11f1-91ce-57b935d93f50
+        symbol: CORDELIA
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: IPO
+        max_bid_count: 3
+        name: Waterways Leisure Tourism (Cordelia Cruises)
+        isin: INE0LZF01013
+        issue_type: BB
+        face_value: 0
+        issue_size: 7607282
+        tick_size: 1
+        lot_size: 18
+        min_qty: 18
+        max_qty: 1901808
+        start_at: '2026-06-23 10:00:00'
+        end_at: '2026-06-25 17:00:00'
+        created_at: '2026-06-19T16:01:04.224198+05:30'
+        updated_at: '2026-06-30T14:55:40.181332+05:30'
+        allotment_finalisation_date: '2026-06-29'
+        refund_initiation_date: '2026-06-30'
+        demat_transfer_date: '2026-06-30'
+        listing_date: '2026-07-01'
+        mandate_end_date: '2026-07-10'
+        rhp_link: https://zerodha.com/ipo/417516/cordelia-cruises/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 769
+            max_price: 808
+            cutoff_price: 808
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 200001
+            min_investment_amount: 13842
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 4fee5420-6a72-11f1-91c9-57b935d93f50
+        symbol: RAMBHAJO
+        active: false
+        status: closed
+        registrar: BIGSHARE
+        sub_type: IPO
+        max_bid_count: 3
+        name: Advit Jewels
+        isin: INE1SJO01012
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 11968000
+        tick_size: 1
+        lot_size: 100
+        min_qty: 100
+        max_qty: 0
+        start_at: '2026-06-23 10:00:00'
+        end_at: '2026-06-25 17:00:00'
+        created_at: '2026-06-17T23:01:02.502408+05:30'
+        updated_at: '2026-06-30T12:52:06.7348+05:30'
+        allotment_finalisation_date: '2026-06-29'
+        refund_initiation_date: '2026-06-30'
+        demat_transfer_date: '2026-06-30'
+        listing_date: '2026-07-01'
+        mandate_end_date: '2026-07-10'
+        rhp_link: https://zerodha.com/ipo/450377/advit-jewels/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 130
+            max_price: 138
+            cutoff_price: 138
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 13000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 243217c6-6e60-11f1-91d4-57b935d93f50
+        symbol: CSM
+        active: false
+        status: closed
+        registrar: KARVY
+        sub_type: IPO
+        max_bid_count: 3
+        name: Csm Technologies
+        isin: INE0ZK601013
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 12901000
+        tick_size: 1
+        lot_size: 132
+        min_qty: 132
+        max_qty: 0
+        start_at: '2026-06-24 10:00:00'
+        end_at: '2026-06-29 17:00:00'
+        created_at: '2026-06-22T23:01:02.836743+05:30'
+        updated_at: '2026-07-01T14:54:04.857347+05:30'
+        allotment_finalisation_date: '2026-06-30'
+        refund_initiation_date: '2026-07-01'
+        demat_transfer_date: '2026-07-01'
+        listing_date: '2026-07-02'
+        mandate_end_date: '2026-07-14'
+        rhp_link: https://zerodha.com/ipo/450662/csm-technologies/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 107
+            max_price: 113
+            cutoff_price: 113
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 200001
+            min_investment_amount: 14124
+            max_investment_amount: 500000
+          - code: EMP
+            description: Employee
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 107
+            max_price: 113
+            cutoff_price: 113
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 200000
+            min_investment_amount: 14124
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: cc1124e8-6fb7-11f1-91e0-57b935d93f50
+        symbol: AASTHA
+        active: false
+        status: closed
+        registrar: BIGSHARE
+        sub_type: IPO
+        max_bid_count: 3
+        name: Aastha Spintex
+        isin: INE2FMX01012
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 12500000
+        tick_size: 1
+        lot_size: 110
+        min_qty: 110
+        max_qty: 0
+        start_at: '2026-06-29 10:00:00'
+        end_at: '2026-07-01 17:00:00'
+        created_at: '2026-06-24T16:01:01.856273+05:30'
+        updated_at: '2026-07-03T17:20:02.663626+05:30'
+        allotment_finalisation_date: '2026-07-02'
+        refund_initiation_date: '2026-07-03'
+        demat_transfer_date: '2026-07-03'
+        listing_date: '2026-07-06'
+        mandate_end_date: '2026-07-15'
+        rhp_link: https://zerodha.com/ipo/439444/aastha-spintex/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 125
+            max_price: 136
+            cutoff_price: 136
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 13750
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7da19c72-70a2-11f1-91ed-57b935d93f50
+        symbol: KNACK
+        active: false
+        status: closed
+        registrar: LINK
+        sub_type: IPO
+        max_bid_count: 3
+        name: Knack Packaging
+        isin: INE17QZ01016
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 25852940
+        tick_size: 1
+        lot_size: 88
+        min_qty: 88
+        max_qty: 0
+        start_at: '2026-07-01 10:00:00'
+        end_at: '2026-07-03 20:00:00'
+        created_at: '2026-06-25T20:01:02.224389+05:30'
+        updated_at: '2026-07-03T20:01:05.456465+05:30'
+        allotment_finalisation_date: '2026-07-06'
+        refund_initiation_date: '2026-07-07'
+        demat_transfer_date: '2026-07-07'
+        listing_date: '2026-07-08'
+        mandate_end_date: '2026-07-18'
+        rhp_link: https://zerodha.com/ipo/451369/knack-packaging/
+        info: ''
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 161
+            max_price: 170
+            cutoff_price: 170
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 200001
+            min_investment_amount: 14168
+            max_investment_amount: 500000
+          - code: EMP
+            description: Employee
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 161
+            max_price: 170
+            cutoff_price: 170
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: A
+            discount_value: ''
+            discount_amount: 16
+            asba_flag: ''
+            max_modification_limit: 200000
+            min_investment_amount: 12760
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 5eafead8-3e36-11f1-919f-57b935d93f50
+        symbol: LESL
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Leapfrog Engineering Services
+        isin: INE0X6O01027
+        issue_type: FP
+        face_value: 0
+        issue_size: 38484000
+        tick_size: 1
+        lot_size: 6000
+        min_qty: 12000
+        max_qty: 36558000
+        start_at: '2026-06-17 10:00:00'
+        end_at: '2026-06-19 17:00:00'
+        created_at: '2026-04-22T16:01:06.304715+05:30'
+        updated_at: '2026-06-23T22:30:58.917719+05:30'
+        allotment_finalisation_date: '2026-06-22'
+        refund_initiation_date: '2026-06-23'
+        demat_transfer_date: '2026-06-23'
+        listing_date: '2026-06-24'
+        mandate_end_date: '2026-07-04'
+        rhp_link: https://zerodha.com/ipo/446411/leapfrog-engineering-services/
+        info: >-
+          High risk: This stock will trade with a lot size of 6000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 21
+            max_price: 23
+            cutoff_price: 23
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 252000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7ad0d078-696e-11f1-91c9-57b935d93f50
+        symbol: DIKSHA
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Diksha Polymers
+        isin: INE1OSI01014
+        issue_type: FP
+        face_value: 0
+        issue_size: 1598400
+        tick_size: 1
+        lot_size: 1200
+        min_qty: 2400
+        max_qty: 1598400
+        start_at: '2026-06-17 10:00:00'
+        end_at: '2026-06-19 17:00:00'
+        created_at: '2026-06-16T16:01:05.301259+05:30'
+        updated_at: '2026-06-23T22:26:37.869084+05:30'
+        allotment_finalisation_date: '2026-06-22'
+        refund_initiation_date: '2026-06-23'
+        demat_transfer_date: '2026-06-23'
+        listing_date: '2026-06-24'
+        mandate_end_date: '2026-07-04'
+        rhp_link: https://zerodha.com/ipo/450242/diksha-polymers/
+        info: >-
+          High risk: This stock will trade with a lot size of 1200 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 112
+            max_price: 112
+            cutoff_price: 112
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 268800
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7ad0d079-696e-11f1-91c9-57b935d93f50
+        symbol: LIOTECH
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Liotech Industries
+        isin: INE0TKX01011
+        issue_type: FP
+        face_value: 0
+        issue_size: 1122000
+        tick_size: 1
+        lot_size: 400
+        min_qty: 800
+        max_qty: 1064000
+        start_at: '2026-06-17 10:00:00'
+        end_at: '2026-06-19 17:00:00'
+        created_at: '2026-06-16T16:01:05.314372+05:30'
+        updated_at: '2026-06-23T18:30:41.155601+05:30'
+        allotment_finalisation_date: '2026-06-22'
+        refund_initiation_date: '2026-06-23'
+        demat_transfer_date: '2026-06-23'
+        listing_date: '2026-06-24'
+        mandate_end_date: '2026-07-04'
+        rhp_link: https://zerodha.com/ipo/449149/liotech-industries/
+        info: >-
+          High risk: This stock will trade with a lot size of 400 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 321
+            max_price: 321
+            cutoff_price: 321
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 256800
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 56aef8ec-666b-11f1-91c5-57b935d93f50
+        symbol: CLAYCRAFT
+        active: false
+        status: closed
+        registrar: KARVY
+        sub_type: SME
+        max_bid_count: 1
+        name: Clay Craft India
+        isin: INE1QGM01024
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 5424000
+        tick_size: 1
+        lot_size: 600
+        min_qty: 1200
+        max_qty: 0
+        start_at: '2026-06-17 10:00:00'
+        end_at: '2026-06-19 17:00:00'
+        created_at: '2026-06-12T20:01:02.703073+05:30'
+        updated_at: '2026-06-23T18:30:16.812055+05:30'
+        allotment_finalisation_date: '2026-06-22'
+        refund_initiation_date: '2026-06-23'
+        demat_transfer_date: '2026-06-23'
+        listing_date: '2026-06-24'
+        mandate_end_date: '2026-07-04'
+        rhp_link: https://zerodha.com/ipo/450277/clay-craft-india/
+        info: >-
+          High risk: This stock will trade with a lot size of 600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 193
+            max_price: 203
+            cutoff_price: 203
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 231600
+            min_investment_amount: 231600
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: a4cd37e4-6a37-11f1-91c9-57b935d93f50
+        symbol: RIYAASAT
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Riyaasat Lifestyle
+        isin: INE0KYI01012
+        issue_type: FP
+        face_value: 0
+        issue_size: 2848800
+        tick_size: 1
+        lot_size: 1200
+        min_qty: 2400
+        max_qty: 2565600
+        start_at: '2026-06-18 10:00:00'
+        end_at: '2026-06-25 17:00:00'
+        created_at: '2026-06-17T16:01:04.584623+05:30'
+        updated_at: '2026-07-01T02:31:20.626399+05:30'
+        allotment_finalisation_date: '2026-06-29'
+        refund_initiation_date: '2026-06-30'
+        demat_transfer_date: '2026-06-30'
+        listing_date: '2026-07-01'
+        mandate_end_date: '2026-07-10'
+        rhp_link: https://zerodha.com/ipo/450465/riyaasat-lifestyle/
+        info: >-
+          High risk: This stock will trade with a lot size of 1200 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 100
+            max_price: 106
+            cutoff_price: 106
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 240000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7ad0d07a-696e-11f1-91c9-57b935d93f50
+        symbol: AVIENCE
+        active: false
+        status: closed
+        registrar: SKYLINE
+        sub_type: SME
+        max_bid_count: 1
+        name: Avience Biomedicals
+        isin: INE0V9I01017
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 1453800
+        tick_size: 1
+        lot_size: 600
+        min_qty: 1200
+        max_qty: 0
+        start_at: '2026-06-18 10:00:00'
+        end_at: '2026-06-22 17:00:00'
+        created_at: '2026-06-16T16:01:05.576043+05:30'
+        updated_at: '2026-06-24T17:05:35.632387+05:30'
+        allotment_finalisation_date: '2026-06-23'
+        refund_initiation_date: '2026-06-24'
+        demat_transfer_date: '2026-06-24'
+        listing_date: '2026-06-25'
+        mandate_end_date: '2026-07-05'
+        rhp_link: https://zerodha.com/ipo/450365/avience-biomedicals/
+        info: >-
+          High risk: This stock will trade with a lot size of 600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 196
+            max_price: 208
+            cutoff_price: 208
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 235200
+            min_investment_amount: 235200
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 2540fc56-69a9-11f1-91c9-57b935d93f50
+        symbol: ANUBHAV
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Anubhav Plast
+        isin: INE1O7201010
+        issue_type: FP
+        face_value: 0
+        issue_size: 3000000
+        tick_size: 1
+        lot_size: 1600
+        min_qty: 3200
+        max_qty: 1430400
+        start_at: '2026-06-19 10:00:00'
+        end_at: '2026-06-23 17:00:00'
+        created_at: '2026-06-16T23:01:02.059493+05:30'
+        updated_at: '2026-06-28T23:04:16.53623+05:30'
+        allotment_finalisation_date: '2026-06-24'
+        refund_initiation_date: '2026-06-25'
+        demat_transfer_date: '2026-06-25'
+        listing_date: '2026-06-29'
+        mandate_end_date: '2026-07-08'
+        rhp_link: https://zerodha.com/ipo/450468/anubhav-plast/?Kite
+        info: >-
+          High risk: This stock will trade with a lot size of 1600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 77
+            max_price: 80
+            cutoff_price: 80
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 246400
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: a4959dce-6c04-11f1-91ce-57b935d93f50
+        symbol: SHREEDHAR
+        active: false
+        status: closed
+        registrar: LINK
+        sub_type: SME
+        max_bid_count: 1
+        name: Shreedhar Spinners
+        isin: INE0K3301012
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 5788000
+        tick_size: 1
+        lot_size: 2000
+        min_qty: 4000
+        max_qty: 0
+        start_at: '2026-06-23 10:00:00'
+        end_at: '2026-06-25 17:00:00'
+        created_at: '2026-06-19T23:01:02.212684+05:30'
+        updated_at: '2026-06-30T18:10:13.738245+05:30'
+        allotment_finalisation_date: '2026-06-29'
+        refund_initiation_date: '2026-06-30'
+        demat_transfer_date: '2026-06-30'
+        listing_date: '2026-07-01'
+        mandate_end_date: '2026-07-10'
+        rhp_link: https://zerodha.com/ipo/450654/shreedhar-spinners/
+        info: >-
+          High risk: This stock will trade with a lot size of 2000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 51
+            max_price: 53
+            cutoff_price: 53
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 204000
+            min_investment_amount: 204000
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 773d928d-6e25-11f1-91d3-57b935d93f50
+        symbol: JIVIAL
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Jivial Industries
+        isin: INE0V3T01017
+        issue_type: FP
+        face_value: 0
+        issue_size: 1632400
+        tick_size: 1
+        lot_size: 600
+        min_qty: 1200
+        max_qty: 1550400
+        start_at: '2026-06-23 10:00:00'
+        end_at: '2026-06-25 17:00:00'
+        created_at: '2026-06-22T16:01:01.858403+05:30'
+        updated_at: '2026-07-01T09:41:10.093509+05:30'
+        allotment_finalisation_date: '2026-06-29'
+        refund_initiation_date: '2026-06-30'
+        demat_transfer_date: '2026-06-30'
+        listing_date: '2026-07-01'
+        mandate_end_date: '2026-07-10'
+        rhp_link: https://zerodha.com/ipo/450765/jivial-industries/
+        info: >-
+          High risk: This stock will trade with a lot size of 600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 196
+            max_price: 196
+            cutoff_price: 196
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 235200
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: a47ca6cf-6eee-11f1-91da-57b935d93f50
+        symbol: SPGCL
+        active: false
+        status: closed
+        registrar: CAMEO
+        sub_type: SME
+        max_bid_count: 1
+        name: Sri Priyanka Geo Commex
+        isin: INE0WEN01019
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 4458000
+        tick_size: 1
+        lot_size: 600
+        min_qty: 1200
+        max_qty: 0
+        start_at: '2026-06-24 10:00:00'
+        end_at: '2026-06-29 17:00:00'
+        created_at: '2026-06-23T16:01:06.729567+05:30'
+        updated_at: '2026-06-29T17:00:01.158401+05:30'
+        allotment_finalisation_date: '2026-06-30'
+        refund_initiation_date: '2026-07-01'
+        demat_transfer_date: '2026-07-01'
+        listing_date: '2026-07-02'
+        mandate_end_date: '2026-07-14'
+        rhp_link: https://zerodha.com/ipo/450886/sri-priyanka-geo-commex/
+        info: >-
+          High risk: This stock will trade with a lot size of 600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 207
+            max_price: 212
+            cutoff_price: 212
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 248400
+            min_investment_amount: 248400
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: cdd58abc-6fb7-11f1-91e0-57b935d93f50
+        symbol: CRAZYSNACK
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Crazy Snacks
+        isin: INE0RBX01014
+        issue_type: FP
+        face_value: 0
+        issue_size: 7494000
+        tick_size: 1
+        lot_size: 3000
+        min_qty: 6000
+        max_qty: 7044000
+        start_at: '2026-06-25 10:00:00'
+        end_at: '2026-06-30 17:00:00'
+        created_at: '2026-06-24T16:01:04.821596+05:30'
+        updated_at: '2026-07-02T17:20:02.284484+05:30'
+        allotment_finalisation_date: '2026-07-01'
+        refund_initiation_date: '2026-07-02'
+        demat_transfer_date: '2026-07-02'
+        listing_date: '2026-07-03'
+        mandate_end_date: '2026-07-14'
+        rhp_link: https://zerodha.com/ipo/450986/crazy-snacks/
+        info: >-
+          High risk: This stock will trade with a lot size of 3000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 39
+            max_price: 42
+            cutoff_price: 42
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 234000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 4a8fad9c-7046-11f1-91e2-57b935d93f50
+        symbol: ADON
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Adon Agro Commodities
+        isin: INE1SME01017
+        issue_type: FP
+        face_value: 0
+        issue_size: 6290000
+        tick_size: 1
+        lot_size: 2000
+        min_qty: 4000
+        max_qty: 5910000
+        start_at: '2026-06-29 10:00:00'
+        end_at: '2026-07-01 17:00:00'
+        created_at: '2026-06-25T09:01:02.614034+05:30'
+        updated_at: '2026-07-03T17:20:03.599128+05:30'
+        allotment_finalisation_date: '2026-07-02'
+        refund_initiation_date: '2026-07-03'
+        demat_transfer_date: '2026-07-03'
+        listing_date: '2026-07-06'
+        mandate_end_date: '2026-07-15'
+        rhp_link: https://zerodha.com/ipo/451364/adon-agro-commodities/
+        info: >-
+          High risk: This stock will trade with a lot size of 2000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 66
+            max_price: 70
+            cutoff_price: 70
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 264000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7da19c70-70a2-11f1-91ed-57b935d93f50
+        symbol: KRATIKAL
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Kratikal Tech
+        isin: INE1L0M01019
+        issue_type: FP
+        face_value: 0
+        issue_size: 2940000
+        tick_size: 1
+        lot_size: 1000
+        min_qty: 2000
+        max_qty: 1401000
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-25T20:01:01.99445+05:30'
+        updated_at: '2026-07-02T23:01:01.994622+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451129/kratikal-tech/
+        info: >-
+          High risk: This stock will trade with a lot size of 1000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 128
+            max_price: 135
+            cutoff_price: 135
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 256000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: a306277f-70bb-11f1-91ed-57b935d93f50
+        symbol: SEEMAX
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Seemax Resources
+        isin: INE1EVO01017
+        issue_type: FP
+        face_value: 0
+        issue_size: 1400000
+        tick_size: 1
+        lot_size: 1000
+        min_qty: 2000
+        max_qty: 1260000
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-25T23:01:02.152011+05:30'
+        updated_at: '2026-07-02T23:01:01.987543+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451379/seemax-resources/
+        info: >-
+          High risk: This stock will trade with a lot size of 1000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 134
+            max_price: 141
+            cutoff_price: 141
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 268000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: f84fb9cf-7080-11f1-91ed-57b935d93f50
+        symbol: ATHARVA
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Atharva Poly-Plast
+        isin: INE226801012
+        issue_type: FP
+        face_value: 0
+        issue_size: 4500000
+        tick_size: 1
+        lot_size: 2000
+        min_qty: 4000
+        max_qty: 2144000
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-25T16:01:04.941473+05:30'
+        updated_at: '2026-07-02T23:01:01.982867+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451003/atharva-polyplast/
+        info: >-
+          High risk: This stock will trade with a lot size of 2000 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 55
+            max_price: 60
+            cutoff_price: 60
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 220000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: 7da19c71-70a2-11f1-91ed-57b935d93f50
+        symbol: SILL
+        active: false
+        status: closed
+        registrar: ''
+        sub_type: SME
+        max_bid_count: 1
+        name: Sampark India Logistics
+        isin: INE147701010
+        issue_type: FP
+        face_value: 0
+        issue_size: 3240000
+        tick_size: 1
+        lot_size: 1600
+        min_qty: 3200
+        max_qty: 1544000
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-25T20:01:02.003659+05:30'
+        updated_at: '2026-07-02T23:01:01.990225+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451125/sampark-india-logistics/
+        info: >-
+          High risk: This stock will trade with a lot size of 1600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '16:00:00'
+            min_price: 80
+            max_price: 84
+            cutoff_price: 84
+            cutoff_disabled: false
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: '1'
+            discount_value: '0.00'
+            discount_amount: 0
+            asba_flag: '1'
+            max_modification_limit: 200000
+            min_investment_amount: 256000
+            max_investment_amount: 500000
+        exchanges:
+          - BSE
+        orders: null
+      - id: a03dbee8-73a5-11f1-91ee-57b935d93f50
+        symbol: TEJA
+        active: false
+        status: closed
+        registrar: KARVY
+        sub_type: SME
+        max_bid_count: 1
+        name: Teja Engineering Industries
+        isin: INE0R1301019
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 1698000
+        tick_size: 1
+        lot_size: 600
+        min_qty: 1200
+        max_qty: 0
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-29T16:01:02.038873+05:30'
+        updated_at: '2026-07-02T17:00:01.785863+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451376/teja-engineering-industries/
+        info: >-
+          High risk: This stock will trade with a lot size of 600 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 220
+            max_price: 220
+            cutoff_price: 220
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 264000
+            min_investment_amount: 264000
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+      - id: 7da19c73-70a2-11f1-91ed-57b935d93f50
+        symbol: VMOBILE
+        active: false
+        status: closed
+        registrar: BIGSHARE
+        sub_type: SME
+        max_bid_count: 1
+        name: Vinit Mobile
+        isin: INE27V201011
+        issue_type: EQUITY
+        face_value: 10
+        issue_size: 2160000
+        tick_size: 1
+        lot_size: 800
+        min_qty: 1600
+        max_qty: 0
+        start_at: '2026-06-30 10:00:00'
+        end_at: '2026-07-02 17:00:00'
+        created_at: '2026-06-25T20:01:02.228964+05:30'
+        updated_at: '2026-07-02T20:01:05.791355+05:30'
+        allotment_finalisation_date: '2026-07-03'
+        refund_initiation_date: '2026-07-06'
+        demat_transfer_date: '2026-07-06'
+        listing_date: '2026-07-07'
+        mandate_end_date: '2026-07-17'
+        rhp_link: https://zerodha.com/ipo/451384/vinit-mobile/
+        info: >-
+          High risk: This stock will trade with a lot size of 800 shares in the
+          SME segment.
+        bond_series: []
+        investor_types:
+          - code: IND
+            description: Individual investor
+            start_time: '10:00:00'
+            end_time: '17:00:00'
+            min_price: 150
+            max_price: 158
+            cutoff_price: 158
+            cutoff_disabled: true
+            restrict_downsize: false
+            cancel_disabled: false
+            discount_type: ''
+            discount_value: ''
+            discount_amount: 0
+            asba_flag: ''
+            max_modification_limit: 240000
+            min_investment_amount: 240000
+            max_investment_amount: 500000
+        exchanges:
+          - NSE
+        orders: null
+  description: Captured API Endpoint for kite.

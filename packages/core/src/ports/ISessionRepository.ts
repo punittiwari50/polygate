@@ -5,4 +5,5 @@ export interface ISessionRepository {
   getActiveSession(appId: number, sessionUuidOrUserId?: string): Promise<SessionCredential | null>;
   listSessions(appId: number): Promise<SessionCredential[]>;
   invalidate(sessionId: number): Promise<void>;
+  deleteInactiveSessions(appId: number): Promise<void>;
 }

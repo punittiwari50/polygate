@@ -32,16 +32,19 @@ function runRepositoryContractTests(
           displayName: "GitHub Copilot",
           baseUrl: "https://github.com/copilot",
           authType: "OAUTH",
-          status: "ACTIVE"
+          status: "ACTIVE",
+          sessionCaptureHeaders: "x-custom-*,authorization"
         };
 
         const saved = await adapter.appRepository.upsert(app);
         expect(saved.id).toBeDefined();
         expect(saved.appKey).toBe("copilot");
+        expect(saved.sessionCaptureHeaders).toBe("x-custom-*,authorization");
 
         const found = await adapter.appRepository.findByKey("copilot");
         expect(found).not.toBeNull();
         expect(found?.displayName).toBe("GitHub Copilot");
+        expect(found?.sessionCaptureHeaders).toBe("x-custom-*,authorization");
 
         const list = await adapter.appRepository.list();
         expect(list.length).toBeGreaterThanOrEqual(1);
@@ -72,11 +75,32 @@ function runRepositoryContractTests(
         expect(active).not.toBeNull();
         expect(active?.cookiePayload).toBe("encrypted-cookies-payload");
 
-        if (active && active.id) {
-          await adapter.sessionRepository.invalidate(active.id);
-          const activeAfter = await adapter.sessionRepository.getActiveSession(app.id!);
-          expect(activeAfter).toBeNull();
+        // Save a second session that we will invalidate
+        const session2 = {
+          appId: app.id!,
+          cookiePayload: "encrypted-cookies-payload-2",
+          headerPayload: "encrypted-headers-payload-2",
+          isActive: true
+        };
+        await adapter.sessionRepository.saveSession(app.id!, session2);
+        
+        const listBefore = await adapter.sessionRepository.listSessions(app.id!);
+        expect(listBefore.length).toBe(2);
+
+        // Invalidate the second session (making it inactive)
+        const active2 = await adapter.sessionRepository.getActiveSession(app.id!); // returns the latest active session
+        expect(active2?.cookiePayload).toBe("encrypted-cookies-payload-2");
+        if (active2 && active2.id) {
+          await adapter.sessionRepository.invalidate(active2.id);
         }
+
+        // Clean up/clear inactive sessions
+        await adapter.sessionRepository.deleteInactiveSessions(app.id!);
+
+        const listAfter = await adapter.sessionRepository.listSessions(app.id!);
+        expect(listAfter.length).toBe(1);
+        expect(listAfter[0].cookiePayload).toBe("encrypted-cookies-payload"); // The active one remains!
+        expect(listAfter[0].isActive).toBe(true);
       });
     });
 
@@ -154,5 +178,21 @@ describe("YamlHelper seedDir auto-resolution", () => {
     expect(initialSeedDir).toBeDefined();
     expect(fs.existsSync(initialSeedDir)).toBe(true);
     expect(path.basename(initialSeedDir)).toBe("seed-data");
+  });
+});
+
+import { PersistenceAdapterFactory } from "../index.js";
+
+describe("PersistenceAdapterFactory", () => {
+  it("should create memory adapter and not throw", async () => {
+    const adapter = await PersistenceAdapterFactory.create("memory");
+    expect(adapter).toBeDefined();
+    expect(adapter.appRepository).toBeDefined();
+  });
+
+  it("should fallback to memory adapter for unrecognized persistence driver", async () => {
+    const adapter = await PersistenceAdapterFactory.create("invalid-driver");
+    expect(adapter).toBeDefined();
+    expect(adapter.appRepository).toBeDefined();
   });
 });

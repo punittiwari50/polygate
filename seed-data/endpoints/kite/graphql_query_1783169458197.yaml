@@ -1,0 +1,480 @@
+endpoint:
+  app: kite
+  name: graphql_query_1783169458197
+  path: /screener/instruments?graphql=query_1783169458197
+  method: POST
+  requiresAuth: true
+  requestHeaders:
+    x-kite-version: 3.0.0
+    sec-ch-ua-platform: '"Windows"'
+    x-csrftoken: <csrfToken>
+    referer: https://kite.zerodha.com/dashboard
+    sec-ch-ua: '"Chromium";v="149", "Not)A;Brand";v="24"'
+    x-kite-app-uuid: <userAppId>
+    sec-ch-ua-mobile: '?0'
+    x-kite-userid: <userId>
+    user-agent: >-
+      Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like
+      Gecko) Chrome/149.0.0.0 Safari/537.36
+    accept: application/json, text/plain, */*
+    content-type: application/json
+  requestBody:
+    type: object
+    properties:
+      query:
+        type: string
+      order_by:
+        type: string
+      order:
+        type: string
+      limit:
+        type: integer
+      offset:
+        type: integer
+      tags:
+        type: array
+        items:
+          type: string
+    required:
+      - query
+      - order_by
+      - order
+      - limit
+      - offset
+      - tags
+  responseBody:
+    type: object
+    properties:
+      status:
+        type: string
+      data:
+        type: object
+        properties:
+          count:
+            type: integer
+          limit:
+            type: integer
+          offset:
+            type: integer
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                segment:
+                  type: string
+                instrument_token:
+                  type: string
+                tradingsymbol:
+                  type: string
+                exchange_token:
+                  type: string
+                isin:
+                  type: string
+                name:
+                  type: string
+                timestamp:
+                  type: string
+                last_trade_time:
+                  type: string
+                last_price:
+                  type: number
+                buy_quantity:
+                  type: integer
+                sell_quantity:
+                  type: integer
+                volume:
+                  type: integer
+                change:
+                  type: number
+                change_percent:
+                  type: number
+                open:
+                  type: number
+                high:
+                  type: number
+                low:
+                  type: integer
+                close:
+                  type: number
+                lower_circuit_limit:
+                  type: number
+                upper_circuit_limit:
+                  type: number
+                average_price:
+                  type: integer
+                trade_value:
+                  type: integer
+                sector:
+                  type: string
+                market_cap:
+                  type: integer
+                pe:
+                  type: number
+                dividend_yield:
+                  type: number
+                roe:
+                  type: number
+                debt_to_equity:
+                  type: integer
+                week_52_high:
+                  type: integer
+                week_52_low:
+                  type: integer
+                revenue_growth_yoy:
+                  type: number
+                pat_growth_yoy:
+                  type: number
+                free_cash_flow:
+                  type: number
+                fundamental_updated_at:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - segment
+                - instrument_token
+                - tradingsymbol
+                - exchange_token
+                - isin
+                - name
+                - timestamp
+                - last_trade_time
+                - last_price
+                - buy_quantity
+                - sell_quantity
+                - volume
+                - change
+                - change_percent
+                - open
+                - high
+                - low
+                - close
+                - lower_circuit_limit
+                - upper_circuit_limit
+                - average_price
+                - trade_value
+                - sector
+                - market_cap
+                - pe
+                - dividend_yield
+                - roe
+                - debt_to_equity
+                - week_52_high
+                - week_52_low
+                - revenue_growth_yoy
+                - pat_growth_yoy
+                - free_cash_flow
+                - fundamental_updated_at
+                - tags
+        required:
+          - count
+          - limit
+          - offset
+          - results
+    required:
+      - status
+      - data
+  sampleResponse:
+    status: success
+    data:
+      count: 259
+      limit: 8
+      offset: 0
+      results:
+        - segment: NSE
+          instrument_token: '4296449'
+          tradingsymbol: GVT&D
+          exchange_token: '16783'
+          isin: INE200A01026
+          name: GE VERNOVA T&D INDIA
+          timestamp: '2026-07-01T01:47:46.416Z'
+          last_trade_time: '2026-07-03T15:53:29+05:30'
+          last_price: 4401.5
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -421.3
+          change_percent: -8.74
+          open: 4581.6
+          high: 4581.6
+          low: 4320
+          close: 4822.8
+          lower_circuit_limit: 3961.4
+          upper_circuit_limit: 4841.6
+          average_price: 0
+          trade_value: 0
+          sector: Electric Equipment
+          market_cap: 126589
+          pe: 102.65
+          dividend_yield: 0.2
+          roe: 34.31
+          debt_to_equity: 0
+          week_52_high: 5650
+          week_52_low: 2265
+          revenue_growth_yoy: 42.04
+          pat_growth_yoy: 88.63
+          free_cash_flow: 1521.46
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+        - segment: NSE
+          instrument_token: '4724993'
+          tradingsymbol: POWERINDIA
+          exchange_token: '18457'
+          isin: INE07Y701011
+          name: HITACHI ENERGY INDIA
+          timestamp: '2026-07-01T01:47:46.099Z'
+          last_trade_time: '2026-07-03T15:59:41+05:30'
+          last_price: 31040
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -2735
+          change_percent: -8.1
+          open: 32085
+          high: 32085
+          low: 30400
+          close: 33775
+          lower_circuit_limit: 27940
+          upper_circuit_limit: 34140
+          average_price: 0
+          trade_value: 0
+          sector: Electric Equipment
+          market_cap: 155647
+          pe: 157.56
+          dividend_yield: 0.02
+          roe: 9.11
+          debt_to_equity: 0
+          week_52_high: 38785
+          week_52_low: 16111
+          revenue_growth_yoy: 46.21
+          pat_growth_yoy: 79.71
+          free_cash_flow: 735.94
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+            - Nifty F&O Stocks
+        - segment: NSE
+          instrument_token: '193758977'
+          tradingsymbol: ENRIN
+          exchange_token: '756871'
+          isin: INE1NPP01017
+          name: SIEMENS ENERGY INDIA
+          timestamp: '2026-07-01T01:47:46.113Z'
+          last_trade_time: '2026-07-03T15:56:12+05:30'
+          last_price: 3281.5
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -268
+          change_percent: -7.55
+          open: 3520
+          high: 3520
+          low: 3265
+          close: 3549.5
+          lower_circuit_limit: 2625.2
+          upper_circuit_limit: 3937.8
+          average_price: 0
+          trade_value: 0
+          sector: Engineering - Construction
+          market_cap: 131765
+          pe: 100.6
+          dividend_yield: 0.11
+          roe: 25.11
+          debt_to_equity: 0
+          week_52_high: 3966.8
+          week_52_low: 2105.15
+          revenue_growth_yoy: 27.38
+          pat_growth_yoy: 52.21
+          free_cash_flow: 3298.5
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 100
+            - Nifty 500
+        - segment: NSE
+          instrument_token: '194561'
+          tradingsymbol: CGPOWER
+          exchange_token: '760'
+          isin: INE067A01029
+          name: CG POWER AND IND SOL
+          timestamp: '2026-07-01T01:47:46.158Z'
+          last_trade_time: '2026-07-03T15:59:53+05:30'
+          last_price: 892.55
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -66.85
+          change_percent: -6.97
+          open: 911.4
+          high: 926
+          low: 887.1
+          close: 959.4
+          lower_circuit_limit: 803.3
+          upper_circuit_limit: 981.8
+          average_price: 0
+          trade_value: 0
+          sector: Electric Equipment
+          market_cap: 149962
+          pe: 113.89
+          dividend_yield: 0.14
+          roe: 25.35
+          debt_to_equity: 0
+          week_52_high: 969.9
+          week_52_low: 525.5
+          revenue_growth_yoy: 25.03
+          pat_growth_yoy: 32.52
+          free_cash_flow: -72.38
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 100
+            - Nifty 500
+            - Nifty F&O Stocks
+        - segment: NSE
+          instrument_token: '889601'
+          tradingsymbol: THERMAX
+          exchange_token: '3475'
+          isin: INE152A01029
+          name: THERMAX
+          timestamp: '2026-07-01T01:47:46.427Z'
+          last_trade_time: '2026-07-03T15:59:27+05:30'
+          last_price: 4607.5
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -309.5
+          change_percent: -6.29
+          open: 4944.5
+          high: 4948.5
+          low: 4575
+          close: 4917
+          lower_circuit_limit: 3686
+          upper_circuit_limit: 5529
+          average_price: 0
+          trade_value: 0
+          sector: Engineering - Industrial Equipments
+          market_cap: 61479
+          pe: 85.33
+          dividend_yield: 0.39
+          roe: 12.85
+          debt_to_equity: 0.34
+          week_52_high: 5277.8
+          week_52_low: 2742.7
+          revenue_growth_yoy: 12.53
+          pat_growth_yoy: 19.31
+          free_cash_flow: -400.9
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+        - segment: NSE
+          instrument_token: '2941697'
+          tradingsymbol: APARINDS
+          exchange_token: '11491'
+          isin: INE372A01015
+          name: APAR INDUSTRIES
+          timestamp: '2026-07-01T01:47:46.211Z'
+          last_trade_time: '2026-07-03T15:59:14+05:30'
+          last_price: 14174
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -927
+          change_percent: -6.14
+          open: 15170
+          high: 15170
+          low: 13975
+          close: 15101
+          lower_circuit_limit: 11340
+          upper_circuit_limit: 17008
+          average_price: 0
+          trade_value: 0
+          sector: Electric Equipment
+          market_cap: 63053
+          pe: 64.54
+          dividend_yield: 0.38
+          roe: 18.24
+          debt_to_equity: 0.1
+          week_52_high: 17157
+          week_52_low: 6801
+          revenue_growth_yoy: 26.74
+          pat_growth_yoy: 1.31
+          free_cash_flow: 234.56
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+        - segment: NSE
+          instrument_token: '3884545'
+          tradingsymbol: TARIL
+          exchange_token: '15174'
+          isin: INE763I01026
+          name: TRANS & RECTI.
+          timestamp: '2026-07-01T01:47:46.357Z'
+          last_trade_time: '2026-07-03T15:59:32+05:30'
+          last_price: 336.75
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -20.5
+          change_percent: -5.74
+          open: 358
+          high: 359.65
+          low: 335.15
+          close: 357.25
+          lower_circuit_limit: 269.4
+          upper_circuit_limit: 404.1
+          average_price: 0
+          trade_value: 0
+          sector: Transformers
+          market_cap: 10546
+          pe: 39.89
+          dividend_yield: 0.07
+          roe: 17.12
+          debt_to_equity: 0.23
+          week_52_high: 578.5
+          week_52_low: 224.05
+          revenue_growth_yoy: 15.7
+          pat_growth_yoy: -2.97
+          free_cash_flow: -214.78
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+        - segment: NSE
+          instrument_token: '1703937'
+          tradingsymbol: POLICYBZR
+          exchange_token: '6656'
+          isin: INE417T01026
+          name: PB FINTECH
+          timestamp: '2026-07-01T01:47:46.088Z'
+          last_trade_time: '2026-07-03T15:59:06+05:30'
+          last_price: 1591.2
+          buy_quantity: 0
+          sell_quantity: 0
+          volume: 0
+          change: -90.9
+          change_percent: -5.4
+          open: 1620
+          high: 1620.2
+          low: 1545.5
+          close: 1682.1
+          lower_circuit_limit: 1432.1
+          upper_circuit_limit: 1750.3
+          average_price: 0
+          trade_value: 0
+          sector: Software Platform
+          market_cap: 75354
+          pe: 112.48
+          dividend_yield: 0
+          roe: 5.49
+          debt_to_equity: 0
+          week_52_high: 1974
+          week_52_low: 1364
+          revenue_growth_yoy: 36.7
+          pat_growth_yoy: 57.2
+          free_cash_flow: -36.37
+          fundamental_updated_at: '2026-07-01T07:17:46+05:30'
+          tags:
+            - Nifty 500
+            - Nifty F&O Stocks
+  description: Captured GraphQL Query for kite.
