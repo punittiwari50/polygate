@@ -139,6 +139,54 @@ export class YamlAppRepository implements IAppRepository {
         }
       }
     }
+
+    // Also load apps from specs/ directories
+    const specsDir = path.join(YamlHelper.getSeedDir(), "specs");
+    if (fs.existsSync(specsDir)) {
+      const specFiles = fs.readdirSync(specsDir).filter(f => f.endsWith("-openapi.yaml"));
+      for (const file of specFiles) {
+        try {
+          const fullPath = path.join(specsDir, file);
+          const content = fs.readFileSync(fullPath, "utf8");
+          const doc = yaml.load(content) as any;
+          const appKey = doc?.["x-polygate-app-key"];
+          if (appKey) {
+            const app: Application = {
+              appKey,
+              displayName: doc["x-polygate-display-name"] || appKey,
+              baseUrl: doc.servers?.[0]?.url || "http://localhost",
+              loginUrl: doc["x-polygate-login-url"],
+              authType: doc["x-polygate-auth-type"] || "NONE",
+              status: doc["x-polygate-status"] || "ACTIVE",
+              loginSuccessUrlPattern: doc["x-polygate-login-success-url-pattern"],
+              loginSuccessCookieName: doc["x-polygate-login-success-cookie-name"],
+              sessionInjectionRules: doc["x-polygate-session-injection-rules"]
+                ? (typeof doc["x-polygate-session-injection-rules"] === "object"
+                    ? JSON.stringify(doc["x-polygate-session-injection-rules"])
+                    : doc["x-polygate-session-injection-rules"])
+                : undefined,
+              userIdCookieName: doc["x-polygate-user-id-cookie-name"],
+              sessionCaptureHeaders: doc["x-polygate-session-capture-headers"],
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+
+            const existingId = YamlAppRepository.appKeyToId.get(appKey.toLowerCase());
+            if (existingId) {
+              app.id = existingId;
+              YamlAppRepository.appCache.set(existingId, app);
+            } else {
+              const id = YamlAppRepository.idCounter++;
+              app.id = id;
+              YamlAppRepository.appCache.set(id, app);
+              YamlAppRepository.appKeyToId.set(appKey.toLowerCase(), id);
+            }
+          }
+        } catch (err: any) {
+          console.warn(`[WARN] Failed to load spec config from ${file}: ${err.message}`);
+        }
+      }
+    }
   }
 
   public async findByKey(appKey: string): Promise<Application | null> {
@@ -297,6 +345,56 @@ export class YamlEndpointRepository implements IEndpointRepository {
     const apps = await this.appRepository.list();
     const app = apps.find(a => a.id === appId);
     if (!app) return [];
+
+    const specPath = path.join(YamlHelper.getSeedDir(), "specs", `${app.appKey.toLowerCase()}-openapi.yaml`);
+    if (fs.existsSync(specPath)) {
+      try {
+        const content = fs.readFileSync(specPath, "utf8");
+        const doc = yaml.load(content) as any;
+        const result: EndpointDefinition[] = [];
+        let idCounter = 1;
+
+        if (doc && doc.paths && typeof doc.paths === "object") {
+          for (const [pathKey, pathObj] of Object.entries(doc.paths)) {
+            if (pathObj && typeof pathObj === "object") {
+              for (const [methodKey, methodObj] of Object.entries(pathObj)) {
+                const operation = methodObj as any;
+                if (operation) {
+                  const headers: Record<string, string> = {};
+                  if (Array.isArray(operation.parameters)) {
+                    for (const param of operation.parameters) {
+                      if (param.in === "header") {
+                        headers[param.name] = param.schema?.default || "required";
+                      }
+                    }
+                  }
+
+                  const reqSchema = operation.requestBody?.content?.["application/json"]?.schema;
+                  const resSchema = operation.responses?.["200"]?.content?.["application/json"]?.schema;
+
+                  result.push({
+                    id: idCounter++,
+                    appId,
+                    name: operation.operationId || operation.summary || `endpoint_${methodKey}_${pathKey.replace(/[^a-zA-Z0-9]/g, "_")}`,
+                    path: pathKey,
+                    httpMethod: methodKey.toUpperCase() as any,
+                    requiresAuth: !!operation.security,
+                    requestHeaders: headers,
+                    requestBodySchema: reqSchema,
+                    responseBodySchema: resSchema,
+                    description: operation.description,
+                    createdAt: new Date()
+                  });
+                }
+              }
+            }
+          }
+        }
+        return result;
+      } catch (err: any) {
+        console.warn(`[WARN] Failed to parse OpenAPI Spec endpoints: ${err.message}`);
+      }
+    }
 
     const endpointsDir = this.getAppEndpointsDir(app.appKey);
     const files = fs.readdirSync(endpointsDir).filter(f => f.endsWith(".yaml") || f.endsWith(".yml"));

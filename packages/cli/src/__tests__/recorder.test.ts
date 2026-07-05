@@ -5,6 +5,7 @@ import { SqlGeneratorFactory } from "@/recorder/SqlGeneratorFactory.js";
 import { SeedToSqlConverter } from "@/recorder/SeedToSqlConverter.js";
 import { Validator } from "@/recorder/Validator.js";
 import { PlaywrightRecorder } from "@/recorder/PlaywrightRecorder.js";
+import { OpenApiSpecGenerator } from "@/recorder/OpenApiSpecGenerator.js";
 
 describe("Playwright Recorder & SQL Generator Subsystem Tests", () => {
   
@@ -203,6 +204,83 @@ describe("Playwright Recorder & SQL Generator Subsystem Tests", () => {
 
       fs.rmSync(tempSeedDir, { recursive: true, force: true });
       delete process.env.SEED_DIR;
+    });
+  });
+
+  describe("OpenApiSpecGenerator Unit Tests", () => {
+    it("should correctly generate a valid OpenAPI 3.0 specification from endpoint definitions", () => {
+      const mockApp = {
+        appKey: "kite",
+        displayName: "Zerodha Kite",
+        baseUrl: "https://kite.zerodha.com",
+        authType: "NONE" as const,
+        status: "ACTIVE" as const
+      };
+
+      const mockEndpoints = [
+        {
+          appId: 1,
+          name: "getHoldings",
+          path: "/portfolio/holdings",
+          httpMethod: "GET" as const,
+          requiresAuth: true,
+          requestHeaders: {
+            "x-kite-version": "required",
+            "authorization": "required"
+          },
+          responseBodySchema: {
+            type: "object",
+            properties: {
+              status: { type: "string" }
+            }
+          }
+        }
+      ];
+
+      const oas = OpenApiSpecGenerator.generate(mockApp, mockEndpoints);
+      expect(oas.openapi).toBe("3.0.3");
+      expect(oas["x-polygate-app-key"]).toBe("kite");
+      expect(oas.paths["/portfolio/holdings"]).toBeDefined();
+      expect(oas.paths["/portfolio/holdings"].get).toBeDefined();
+      expect(oas.paths["/portfolio/holdings"].get.parameters.length).toBe(2);
+      expect(oas.paths["/portfolio/holdings"].get.security).toEqual([{ bearerAuth: [] }]);
+    });
+  });
+
+  describe("Validator.validateOpenApi Unit Tests", () => {
+    it("should validate and return validation result for OpenAPI Specs", () => {
+      const tempSpec = path.join(__dirname, "temp-spec.yaml");
+      fs.writeFileSync(
+        tempSpec,
+        `openapi: 3.0.3
+info:
+  title: Test App
+  version: 1.0.0
+paths: {}
+x-polygate-app-key: testapp`,
+        "utf8"
+      );
+
+      const result = Validator.validateOpenApi(tempSpec);
+      expect(result.isValid).toBe(true);
+
+      fs.unlinkSync(tempSpec);
+    });
+
+    it("should report missing required OpenAPI fields", () => {
+      const tempSpec = path.join(__dirname, "temp-spec.yaml");
+      fs.writeFileSync(
+        tempSpec,
+        `info:
+  title: Test App`,
+        "utf8"
+      );
+
+      const result = Validator.validateOpenApi(tempSpec);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("Missing required 'openapi' version field");
+
+      fs.unlinkSync(tempSpec);
     });
   });
 });

@@ -1,0 +1,3961 @@
+openapi: 3.0.3
+info:
+  title: KITE Captured Application
+  version: 1.0.0
+  description: 'OpenAPI specification for PolyGate app: kite'
+servers:
+  - url: https://kite.zerodha.com
+paths:
+  /oms/portfolio/holdings:
+    get:
+      summary: get_oms_portfolio_holdings
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_portfolio_holdings
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tradingsymbol:
+                          type: string
+                        exchange:
+                          type: string
+                        instrument_token:
+                          type: integer
+                        isin:
+                          type: string
+                        product:
+                          type: string
+                        price:
+                          type: integer
+                        quantity:
+                          type: integer
+                        used_quantity:
+                          type: integer
+                        t1_quantity:
+                          type: integer
+                        realised_quantity:
+                          type: integer
+                        authorised_quantity:
+                          type: integer
+                        authorised_date:
+                          type: string
+                        authorisation:
+                          type: object
+                          properties: {}
+                        opening_quantity:
+                          type: integer
+                        short_quantity:
+                          type: integer
+                        collateral_quantity:
+                          type: integer
+                        collateral_type:
+                          type: string
+                        discrepancy:
+                          type: boolean
+                        average_price:
+                          type: integer
+                        last_price:
+                          type: number
+                        close_price:
+                          type: integer
+                        pnl:
+                          type: number
+                        day_change:
+                          type: number
+                        day_change_percentage:
+                          type: number
+                        mtf:
+                          type: object
+                          properties:
+                            quantity:
+                              type: integer
+                            used_quantity:
+                              type: integer
+                            average_price:
+                              type: integer
+                            value:
+                              type: integer
+                            initial_margin:
+                              type: integer
+                          required:
+                            - quantity
+                            - used_quantity
+                            - average_price
+                            - value
+                            - initial_margin
+                      required:
+                        - tradingsymbol
+                        - exchange
+                        - instrument_token
+                        - isin
+                        - product
+                        - price
+                        - quantity
+                        - used_quantity
+                        - t1_quantity
+                        - realised_quantity
+                        - authorised_quantity
+                        - authorised_date
+                        - authorisation
+                        - opening_quantity
+                        - short_quantity
+                        - collateral_quantity
+                        - collateral_type
+                        - discrepancy
+                        - average_price
+                        - last_price
+                        - close_price
+                        - pnl
+                        - day_change
+                        - day_change_percentage
+                        - mtf
+                required:
+                  - status
+                  - data
+  /oms/user/margins:
+    get:
+      summary: get_oms_user_margins
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_user_margins
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      equity:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          net:
+                            type: integer
+                          available:
+                            type: object
+                            properties:
+                              adhoc_margin:
+                                type: integer
+                              cash:
+                                type: integer
+                              opening_balance:
+                                type: integer
+                              live_balance:
+                                type: integer
+                              collateral:
+                                type: integer
+                              intraday_payin:
+                                type: integer
+                            required:
+                              - adhoc_margin
+                              - cash
+                              - opening_balance
+                              - live_balance
+                              - collateral
+                              - intraday_payin
+                          utilised:
+                            type: object
+                            properties:
+                              debits:
+                                type: integer
+                              exposure:
+                                type: integer
+                              m2m_realised:
+                                type: integer
+                              m2m_unrealised:
+                                type: integer
+                              option_premium:
+                                type: integer
+                              payout:
+                                type: integer
+                              span:
+                                type: integer
+                              holding_sales:
+                                type: integer
+                              turnover:
+                                type: integer
+                              liquid_collateral:
+                                type: integer
+                              stock_collateral:
+                                type: integer
+                              equity:
+                                type: integer
+                              delivery:
+                                type: integer
+                              spread_benefit_nfo:
+                                type: integer
+                            required:
+                              - debits
+                              - exposure
+                              - m2m_realised
+                              - m2m_unrealised
+                              - option_premium
+                              - payout
+                              - span
+                              - holding_sales
+                              - turnover
+                              - liquid_collateral
+                              - stock_collateral
+                              - equity
+                              - delivery
+                              - spread_benefit_nfo
+                        required:
+                          - enabled
+                          - net
+                          - available
+                          - utilised
+                      commodity:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                          net:
+                            type: integer
+                          available:
+                            type: object
+                            properties:
+                              adhoc_margin:
+                                type: integer
+                              cash:
+                                type: integer
+                              opening_balance:
+                                type: integer
+                              live_balance:
+                                type: integer
+                              collateral:
+                                type: integer
+                              intraday_payin:
+                                type: integer
+                            required:
+                              - adhoc_margin
+                              - cash
+                              - opening_balance
+                              - live_balance
+                              - collateral
+                              - intraday_payin
+                          utilised:
+                            type: object
+                            properties:
+                              debits:
+                                type: integer
+                              exposure:
+                                type: integer
+                              m2m_realised:
+                                type: integer
+                              m2m_unrealised:
+                                type: integer
+                              option_premium:
+                                type: integer
+                              payout:
+                                type: integer
+                              span:
+                                type: integer
+                              holding_sales:
+                                type: integer
+                              turnover:
+                                type: integer
+                              liquid_collateral:
+                                type: integer
+                              stock_collateral:
+                                type: integer
+                              equity:
+                                type: integer
+                              delivery:
+                                type: integer
+                              spread_benefit_nfo:
+                                type: integer
+                            required:
+                              - debits
+                              - exposure
+                              - m2m_realised
+                              - m2m_unrealised
+                              - option_premium
+                              - payout
+                              - span
+                              - holding_sales
+                              - turnover
+                              - liquid_collateral
+                              - stock_collateral
+                              - equity
+                              - delivery
+                              - spread_benefit_nfo
+                        required:
+                          - enabled
+                          - net
+                          - available
+                          - utilised
+                    required:
+                      - equity
+                      - commodity
+                required:
+                  - status
+                  - data
+  /api/banner:
+    get:
+      summary: get_api_banner
+      description: Captured API Endpoint for kite.
+      operationId: get_api_banner
+      parameters:
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      image:
+                        type: string
+                      action_url:
+                        type: string
+                      action_label:
+                        type: string
+                      image_click:
+                        type: boolean
+                      action_button_background_color:
+                        type: string
+                      action_button_text_color:
+                        type: string
+                      action_button_alignment:
+                        type: string
+                      action_position_bottom:
+                        type: integer
+                      action_position_top:
+                        type: integer
+                      action_position_left:
+                        type: integer
+                      action_position_right:
+                        type: integer
+                      border_color:
+                        type: string
+                      dark:
+                        type: object
+                        properties:
+                          image:
+                            type: string
+                        required:
+                          - image
+                    required:
+                      - image
+                      - action_url
+                      - action_label
+                      - image_click
+                      - action_button_background_color
+                      - action_button_text_color
+                      - action_button_alignment
+                      - action_position_bottom
+                      - action_position_top
+                      - action_position_left
+                      - action_position_right
+                      - border_color
+                      - dark
+                required:
+                  - status
+                  - data
+  /api/baskets:
+    get:
+      summary: get_api_baskets
+      description: Captured API Endpoint for kite.
+      operationId: get_api_baskets
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        type:
+                          type: string
+                        name:
+                          type: string
+                        tags:
+                          type: array
+                          items: {}
+                        items:
+                          type: array
+                          items: {}
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                        meta:
+                          type: object
+                          properties: {}
+                      required:
+                        - id
+                        - type
+                        - name
+                        - tags
+                        - items
+                        - created_at
+                        - updated_at
+                        - meta
+                required:
+                  - status
+                  - data
+  /api/marketwatch:
+    get:
+      summary: get_api_marketwatch
+      description: Captured API Endpoint for kite.
+      operationId: get_api_marketwatch
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              name:
+                                type: string
+                              weight:
+                                type: integer
+                              is_static:
+                                type: boolean
+                              static_id:
+                                type: 'null'
+                            required:
+                              - id
+                              - name
+                              - weight
+                              - is_static
+                              - static_id
+                      required:
+                        - name
+                        - items
+                required:
+                  - status
+                  - data
+  /api/marketwatch/:id/items:
+    get:
+      summary: get_api_marketwatch_id_items
+      description: Captured API Endpoint for kite.
+      operationId: get_api_marketwatch_id_items
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      groups:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            weight:
+                              type: integer
+                            color:
+                              type: 'null'
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  weight:
+                                    type: integer
+                                  note:
+                                    type: 'null'
+                                  tradingsymbol:
+                                    type: string
+                                  instrument_token:
+                                    type: integer
+                                  segment:
+                                    type: string
+                                  exchange:
+                                    type: string
+                                  expiry:
+                                    type: string
+                                required:
+                                  - id
+                                  - weight
+                                  - note
+                                  - tradingsymbol
+                                  - instrument_token
+                                  - segment
+                                  - exchange
+                                  - expiry
+                          required:
+                            - id
+                            - name
+                            - weight
+                            - color
+                            - items
+                      weight:
+                        type: integer
+                      is_static:
+                        type: boolean
+                      static_id:
+                        type: 'null'
+                    required:
+                      - id
+                      - name
+                      - groups
+                      - weight
+                      - is_static
+                      - static_id
+                required:
+                  - status
+                  - data
+  /api/market-overview:
+    get:
+      summary: get_api_market_overview
+      description: Captured API Endpoint for kite.
+      operationId: get_api_market_overview
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        close_price:
+                          type: integer
+                      required:
+                        - timestamp
+                        - close_price
+                required:
+                  - status
+                  - data
+  /api/preferences:
+    get:
+      summary: get_api_preferences
+      description: Captured API Endpoint for kite.
+      operationId: get_api_preferences
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      chart_type:
+                        type: string
+                      order_update:
+                        type: string
+                      theme_web:
+                        type: string
+                      tours:
+                        type: string
+                    required:
+                      - chart_type
+                      - order_update
+                      - theme_web
+                      - tours
+                required:
+                  - status
+                  - data
+  /api/tags:
+    get:
+      summary: get_api_tags
+      description: Captured API Endpoint for kite.
+      operationId: get_api_tags
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+                required:
+                  - status
+                  - data
+  /api/widgets/ipo:
+    get:
+      summary: get_api_widgets_ipo
+      description: Captured API Endpoint for kite.
+      operationId: get_api_widgets_ipo
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tradingsymbol:
+                          type: string
+                        name:
+                          type: string
+                        start_date:
+                          type: string
+                        type:
+                          type: string
+                        end_date:
+                          type: string
+                        listing_date:
+                          type: string
+                        url:
+                          type: string
+                        thumb:
+                          type: string
+                        upcoming:
+                          type: boolean
+                        live:
+                          type: boolean
+                        closed:
+                          type: boolean
+                      required:
+                        - tradingsymbol
+                        - name
+                        - start_date
+                        - type
+                        - end_date
+                        - listing_date
+                        - url
+                        - thumb
+                        - upcoming
+                        - live
+                        - closed
+                required:
+                  - status
+                  - data
+  /api/workspaces:
+    get:
+      summary: get_api_workspaces
+      description: Captured API Endpoint for kite.
+      operationId: get_api_workspaces
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                      required:
+                        - id
+                        - name
+                        - created_at
+                        - updated_at
+                required:
+                  - status
+                  - data
+  /oms/alerts:
+    get:
+      summary: get_oms_alerts
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_alerts
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        user_id:
+                          type: string
+                        uuid:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        disabled_reason:
+                          type: string
+                        lhs_attribute:
+                          type: string
+                        lhs_exchange:
+                          type: string
+                        lhs_tradingsymbol:
+                          type: string
+                        operator:
+                          type: string
+                        rhs_type:
+                          type: string
+                        rhs_attribute:
+                          type: string
+                        rhs_exchange:
+                          type: string
+                        rhs_tradingsymbol:
+                          type: string
+                        rhs_constant:
+                          type: integer
+                        alert_count:
+                          type: integer
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                      required:
+                        - type
+                        - user_id
+                        - uuid
+                        - name
+                        - status
+                        - disabled_reason
+                        - lhs_attribute
+                        - lhs_exchange
+                        - lhs_tradingsymbol
+                        - operator
+                        - rhs_type
+                        - rhs_attribute
+                        - rhs_exchange
+                        - rhs_tradingsymbol
+                        - rhs_constant
+                        - alert_count
+                        - created_at
+                        - updated_at
+                required:
+                  - status
+                  - data
+  /oms/bulletins:
+    get:
+      summary: get_oms_bulletins
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_bulletins
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uuid:
+                          type: string
+                        priority:
+                          type: string
+                        status:
+                          type: string
+                        scopes:
+                          type: array
+                          items:
+                            type: string
+                        channels:
+                          type: array
+                          items:
+                            type: string
+                        content:
+                          type: string
+                        is_sticky:
+                          type: boolean
+                        created_at:
+                          type: string
+                        expires_at:
+                          type: string
+                      required:
+                        - uuid
+                        - priority
+                        - status
+                        - scopes
+                        - channels
+                        - content
+                        - is_sticky
+                        - created_at
+                        - expires_at
+                required:
+                  - status
+                  - data
+  /oms/gtt/triggers:
+    get:
+      summary: get_oms_gtt_triggers
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_gtt_triggers
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+                required:
+                  - status
+                  - data
+  /oms/ipo/applications:
+    get:
+      summary: get_oms_ipo_applications
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_ipo_applications
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+                required:
+                  - status
+                  - data
+  /oms/ipo/instruments:
+    get:
+      summary: get_oms_ipo_instruments
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_ipo_instruments
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        symbol:
+                          type: string
+                        active:
+                          type: boolean
+                        status:
+                          type: string
+                        registrar:
+                          type: string
+                        sub_type:
+                          type: string
+                        max_bid_count:
+                          type: integer
+                        name:
+                          type: string
+                        isin:
+                          type: string
+                        issue_type:
+                          type: string
+                        face_value:
+                          type: integer
+                        issue_size:
+                          type: integer
+                        tick_size:
+                          type: integer
+                        lot_size:
+                          type: integer
+                        min_qty:
+                          type: integer
+                        max_qty:
+                          type: integer
+                        start_at:
+                          type: string
+                        end_at:
+                          type: string
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+                        allotment_finalisation_date:
+                          type: string
+                        refund_initiation_date:
+                          type: string
+                        demat_transfer_date:
+                          type: string
+                        listing_date:
+                          type: string
+                        mandate_end_date:
+                          type: string
+                        rhp_link:
+                          type: string
+                        info:
+                          type: string
+                        bond_series:
+                          type: array
+                          items: {}
+                        investor_types:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                              description:
+                                type: string
+                              start_time:
+                                type: string
+                              end_time:
+                                type: string
+                              min_price:
+                                type: integer
+                              max_price:
+                                type: integer
+                              cutoff_price:
+                                type: integer
+                              cutoff_disabled:
+                                type: boolean
+                              restrict_downsize:
+                                type: boolean
+                              cancel_disabled:
+                                type: boolean
+                              discount_type:
+                                type: string
+                              discount_value:
+                                type: string
+                              discount_amount:
+                                type: integer
+                              asba_flag:
+                                type: string
+                              max_modification_limit:
+                                type: integer
+                              min_investment_amount:
+                                type: integer
+                              max_investment_amount:
+                                type: integer
+                            required:
+                              - code
+                              - description
+                              - start_time
+                              - end_time
+                              - min_price
+                              - max_price
+                              - cutoff_price
+                              - cutoff_disabled
+                              - restrict_downsize
+                              - cancel_disabled
+                              - discount_type
+                              - discount_value
+                              - discount_amount
+                              - asba_flag
+                              - max_modification_limit
+                              - min_investment_amount
+                              - max_investment_amount
+                        exchanges:
+                          type: array
+                          items:
+                            type: string
+                        orders:
+                          type: 'null'
+                      required:
+                        - id
+                        - symbol
+                        - active
+                        - status
+                        - registrar
+                        - sub_type
+                        - max_bid_count
+                        - name
+                        - isin
+                        - issue_type
+                        - face_value
+                        - issue_size
+                        - tick_size
+                        - lot_size
+                        - min_qty
+                        - max_qty
+                        - start_at
+                        - end_at
+                        - created_at
+                        - updated_at
+                        - allotment_finalisation_date
+                        - refund_initiation_date
+                        - demat_transfer_date
+                        - listing_date
+                        - mandate_end_date
+                        - rhp_link
+                        - info
+                        - bond_series
+                        - investor_types
+                        - exchanges
+                        - orders
+                required:
+                  - status
+                  - data
+  /oms/orders:
+    get:
+      summary: get_oms_orders
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_orders
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items: {}
+                required:
+                  - status
+                  - data
+  /oms/portfolio/positions:
+    get:
+      summary: get_oms_portfolio_positions
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_portfolio_positions
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      net:
+                        type: array
+                        items: {}
+                      day:
+                        type: array
+                        items: {}
+                    required:
+                      - net
+                      - day
+                required:
+                  - status
+                  - data
+  /oms/user/profile/full:
+    get:
+      summary: get_oms_user_profile_full
+      description: Captured API Endpoint for kite.
+      operationId: get_oms_user_profile_full
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      user_id:
+                        type: string
+                      twofa_type:
+                        type: string
+                      user_name:
+                        type: string
+                      user_type:
+                        type: string
+                      email:
+                        type: string
+                      phone:
+                        type: string
+                      phone_code:
+                        type: string
+                      broker:
+                        type: string
+                      bank_accounts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            branch:
+                              type: string
+                            account:
+                              type: string
+                          required:
+                            - name
+                            - branch
+                            - account
+                      dp_ids:
+                        type: array
+                        items:
+                          type: string
+                      products:
+                        type: array
+                        items:
+                          type: string
+                      order_types:
+                        type: array
+                        items:
+                          type: string
+                      exchanges:
+                        type: array
+                        items:
+                          type: string
+                      pan:
+                        type: string
+                      user_shortname:
+                        type: string
+                      avatar_url:
+                        type: 'null'
+                      tags:
+                        type: array
+                        items: {}
+                      password_timestamp:
+                        type: string
+                      twofa_timestamp:
+                        type: string
+                      meta:
+                        type: object
+                        properties:
+                          cobrands:
+                            type: array
+                            items: {}
+                          poa:
+                            type: string
+                          features:
+                            type: array
+                            items:
+                              type: string
+                          silo:
+                            type: string
+                          account_blocks:
+                            type: array
+                            items: {}
+                          cp_code:
+                            type: string
+                          welcome_email_sent:
+                            type: boolean
+                        required:
+                          - cobrands
+                          - poa
+                          - features
+                          - silo
+                          - account_blocks
+                          - cp_code
+                          - welcome_email_sent
+                    required:
+                      - user_id
+                      - twofa_type
+                      - user_name
+                      - user_type
+                      - email
+                      - phone
+                      - phone_code
+                      - broker
+                      - bank_accounts
+                      - dp_ids
+                      - products
+                      - order_types
+                      - exchanges
+                      - pan
+                      - user_shortname
+                      - avatar_url
+                      - tags
+                      - password_timestamp
+                      - twofa_timestamp
+                      - meta
+                required:
+                  - status
+                  - data
+  /static/json/instruments.json:
+    get:
+      summary: get_static_json_instruments_json
+      description: Captured API Endpoint for kite.
+      operationId: get_static_json_instruments_json
+      parameters:
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  underlying_symbols:
+                    type: object
+                    properties:
+                      BFO:BANKEX:
+                        type: string
+                      BFO:SENSEX50:
+                        type: string
+                      NFO:NIFTYNXT50:
+                        type: string
+                      NFO:FINNIFTY:
+                        type: string
+                      NFO:MIDCPNIFTY:
+                        type: string
+                      BFO:SENSEX:
+                        type: string
+                      NFO:BANKNIFTY:
+                        type: string
+                      NFO:NIFTY:
+                        type: string
+                    required:
+                      - BFO:BANKEX
+                      - BFO:SENSEX50
+                      - NFO:NIFTYNXT50
+                      - NFO:FINNIFTY
+                      - NFO:MIDCPNIFTY
+                      - BFO:SENSEX
+                      - NFO:BANKNIFTY
+                      - NFO:NIFTY
+                  months:
+                    type: array
+                    items:
+                      type: string
+                  segments_id_map:
+                    type: object
+                    properties:
+                      NFO-OPT:
+                        type: integer
+                      BCD-OPT:
+                        type: integer
+                      NCO-FUT:
+                        type: integer
+                      BFO-OPT:
+                        type: integer
+                      BFO-FUT:
+                        type: integer
+                      NCO-OPT:
+                        type: integer
+                      NFO:
+                        type: integer
+                      NFO-FUT:
+                        type: integer
+                      BFO:
+                        type: integer
+                      NSE:
+                        type: integer
+                      CDS-FUT:
+                        type: integer
+                      MCXSX:
+                        type: integer
+                      MCX-FUT:
+                        type: integer
+                      NCDEX:
+                        type: integer
+                      CDS:
+                        type: integer
+                      INDICES:
+                        type: integer
+                      BSE:
+                        type: integer
+                      MCX-OPT:
+                        type: integer
+                      BCD-FUT:
+                        type: integer
+                      CDS-OPT:
+                        type: integer
+                    required:
+                      - NFO-OPT
+                      - BCD-OPT
+                      - NCO-FUT
+                      - BFO-OPT
+                      - BFO-FUT
+                      - NCO-OPT
+                      - NFO
+                      - NFO-FUT
+                      - BFO
+                      - NSE
+                      - CDS-FUT
+                      - MCXSX
+                      - MCX-FUT
+                      - NCDEX
+                      - CDS
+                      - INDICES
+                      - BSE
+                      - MCX-OPT
+                      - BCD-FUT
+                      - CDS-OPT
+                  tradeable_segments:
+                    type: array
+                    items:
+                      type: string
+                  segments:
+                    type: array
+                    items:
+                      type: string
+                  strike_precision:
+                    type: object
+                    properties: {}
+                  weekly_months:
+                    type: object
+                    properties:
+                      '1':
+                        type: string
+                      '2':
+                        type: string
+                      '3':
+                        type: string
+                      '4':
+                        type: string
+                      '5':
+                        type: string
+                      '6':
+                        type: string
+                      '7':
+                        type: string
+                      '8':
+                        type: string
+                      '9':
+                        type: string
+                      D:
+                        type: string
+                      O:
+                        type: string
+                      'N':
+                        type: string
+                    required:
+                      - '1'
+                      - '2'
+                      - '3'
+                      - '4'
+                      - '5'
+                      - '6'
+                      - '7'
+                      - '8'
+                      - '9'
+                      - D
+                      - O
+                      - 'N'
+                  events:
+                    type: array
+                    items:
+                      type: string
+                  equity_segments:
+                    type: array
+                    items:
+                      type: string
+                  segments_aliases:
+                    type: object
+                    properties:
+                      BCD-OPT:
+                        type: array
+                        items:
+                          type: string
+                      CDS-FUT:
+                        type: array
+                        items:
+                          type: string
+                      NCO-FUT:
+                        type: array
+                        items:
+                          type: string
+                      BFO-FUT:
+                        type: array
+                        items:
+                          type: string
+                      BCD-FUT:
+                        type: array
+                        items:
+                          type: string
+                      NSE:
+                        type: array
+                        items:
+                          type: string
+                      INDICES:
+                        type: array
+                        items:
+                          type: string
+                      CDS-OPT:
+                        type: array
+                        items:
+                          type: string
+                      NFO-OPT:
+                        type: array
+                        items:
+                          type: string
+                      BFO-OPT:
+                        type: array
+                        items:
+                          type: string
+                      NCO-OPT:
+                        type: array
+                        items:
+                          type: string
+                      MCX-FUT:
+                        type: array
+                        items:
+                          type: string
+                      BSE:
+                        type: array
+                        items:
+                          type: string
+                      MCX-OPT:
+                        type: array
+                        items:
+                          type: string
+                      NFO-FUT:
+                        type: array
+                        items:
+                          type: string
+                    required:
+                      - BCD-OPT
+                      - CDS-FUT
+                      - NCO-FUT
+                      - BFO-FUT
+                      - BCD-FUT
+                      - NSE
+                      - INDICES
+                      - CDS-OPT
+                      - NFO-OPT
+                      - BFO-OPT
+                      - NCO-OPT
+                      - MCX-FUT
+                      - BSE
+                      - MCX-OPT
+                      - NFO-FUT
+                  instruments:
+                    type: object
+                    properties:
+                      NFO-OPT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      NCO-FUT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      BFO-OPT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      BFO-FUT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      NFO-FUT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      NCO-OPT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      NSE:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: integer
+                      CDS-FUT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      MCX-FUT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      INDICES:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: integer
+                      BSE:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: integer
+                      MCX-OPT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                      CDS-OPT:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: string
+                    required:
+                      - NFO-OPT
+                      - NCO-FUT
+                      - BFO-OPT
+                      - BFO-FUT
+                      - NFO-FUT
+                      - NCO-OPT
+                      - NSE
+                      - CDS-FUT
+                      - MCX-FUT
+                      - INDICES
+                      - BSE
+                      - MCX-OPT
+                      - CDS-OPT
+                  futures_segments:
+                    type: array
+                    items:
+                      type: string
+                  segments_exchange_map:
+                    type: object
+                    properties:
+                      NFO-OPT:
+                        type: string
+                      BCD-OPT:
+                        type: string
+                      NCO-FUT:
+                        type: string
+                      BFO-OPT:
+                        type: string
+                      BFO-FUT:
+                        type: string
+                      NFO-FUT:
+                        type: string
+                      NCO-OPT:
+                        type: string
+                      NSE:
+                        type: string
+                      CDS-FUT:
+                        type: string
+                      MCXSX:
+                        type: string
+                      MCX-FUT:
+                        type: string
+                      INDICES:
+                        type: string
+                      BSE:
+                        type: string
+                      MCX-OPT:
+                        type: string
+                      BCD-FUT:
+                        type: string
+                      CDS-OPT:
+                        type: string
+                    required:
+                      - NFO-OPT
+                      - BCD-OPT
+                      - NCO-FUT
+                      - BFO-OPT
+                      - BFO-FUT
+                      - NFO-FUT
+                      - NCO-OPT
+                      - NSE
+                      - CDS-FUT
+                      - MCXSX
+                      - MCX-FUT
+                      - INDICES
+                      - BSE
+                      - MCX-OPT
+                      - BCD-FUT
+                      - CDS-OPT
+                  news:
+                    type: array
+                    items: {}
+                  exchange_segments:
+                    type: array
+                    items:
+                      type: string
+                  options_segments:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - underlying_symbols
+                  - months
+                  - segments_id_map
+                  - tradeable_segments
+                  - segments
+                  - strike_precision
+                  - weekly_months
+                  - events
+                  - equity_segments
+                  - segments_aliases
+                  - instruments
+                  - futures_segments
+                  - segments_exchange_map
+                  - news
+                  - exchange_segments
+                  - options_segments
+  /screener/instruments?graphql=query_1783169457985:
+    post:
+      summary: graphql_query_1783169457985
+      description: Captured GraphQL Query for kite.
+      operationId: graphql_query_1783169457985
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                order_by:
+                  type: string
+                order:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+                tags:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - query
+                - order_by
+                - order
+                - limit
+                - offset
+                - tags
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            segment:
+                              type: string
+                            instrument_token:
+                              type: string
+                            tradingsymbol:
+                              type: string
+                            exchange_token:
+                              type: string
+                            isin:
+                              type: string
+                            name:
+                              type: string
+                            timestamp:
+                              type: string
+                            last_trade_time:
+                              type: string
+                            last_price:
+                              type: number
+                            buy_quantity:
+                              type: integer
+                            sell_quantity:
+                              type: integer
+                            volume:
+                              type: integer
+                            change:
+                              type: number
+                            change_percent:
+                              type: number
+                            open:
+                              type: integer
+                            high:
+                              type: number
+                            low:
+                              type: number
+                            close:
+                              type: number
+                            lower_circuit_limit:
+                              type: number
+                            upper_circuit_limit:
+                              type: number
+                            average_price:
+                              type: integer
+                            trade_value:
+                              type: integer
+                            sector:
+                              type: string
+                            market_cap:
+                              type: integer
+                            pe:
+                              type: number
+                            dividend_yield:
+                              type: number
+                            roe:
+                              type: number
+                            debt_to_equity:
+                              type: integer
+                            week_52_high:
+                              type: integer
+                            week_52_low:
+                              type: number
+                            revenue_growth_yoy:
+                              type: number
+                            pat_growth_yoy:
+                              type: number
+                            free_cash_flow:
+                              type: number
+                            fundamental_updated_at:
+                              type: string
+                            tags:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - segment
+                            - instrument_token
+                            - tradingsymbol
+                            - exchange_token
+                            - isin
+                            - name
+                            - timestamp
+                            - last_trade_time
+                            - last_price
+                            - buy_quantity
+                            - sell_quantity
+                            - volume
+                            - change
+                            - change_percent
+                            - open
+                            - high
+                            - low
+                            - close
+                            - lower_circuit_limit
+                            - upper_circuit_limit
+                            - average_price
+                            - trade_value
+                            - sector
+                            - market_cap
+                            - pe
+                            - dividend_yield
+                            - roe
+                            - debt_to_equity
+                            - week_52_high
+                            - week_52_low
+                            - revenue_growth_yoy
+                            - pat_growth_yoy
+                            - free_cash_flow
+                            - fundamental_updated_at
+                            - tags
+                    required:
+                      - count
+                      - limit
+                      - offset
+                      - results
+                required:
+                  - status
+                  - data
+  /screener/instruments?graphql=query_1783169458197:
+    post:
+      summary: graphql_query_1783169458197
+      description: Captured GraphQL Query for kite.
+      operationId: graphql_query_1783169458197
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-csrftoken
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                order_by:
+                  type: string
+                order:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+                tags:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - query
+                - order_by
+                - order
+                - limit
+                - offset
+                - tags
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            segment:
+                              type: string
+                            instrument_token:
+                              type: string
+                            tradingsymbol:
+                              type: string
+                            exchange_token:
+                              type: string
+                            isin:
+                              type: string
+                            name:
+                              type: string
+                            timestamp:
+                              type: string
+                            last_trade_time:
+                              type: string
+                            last_price:
+                              type: number
+                            buy_quantity:
+                              type: integer
+                            sell_quantity:
+                              type: integer
+                            volume:
+                              type: integer
+                            change:
+                              type: number
+                            change_percent:
+                              type: number
+                            open:
+                              type: number
+                            high:
+                              type: number
+                            low:
+                              type: integer
+                            close:
+                              type: number
+                            lower_circuit_limit:
+                              type: number
+                            upper_circuit_limit:
+                              type: number
+                            average_price:
+                              type: integer
+                            trade_value:
+                              type: integer
+                            sector:
+                              type: string
+                            market_cap:
+                              type: integer
+                            pe:
+                              type: number
+                            dividend_yield:
+                              type: number
+                            roe:
+                              type: number
+                            debt_to_equity:
+                              type: integer
+                            week_52_high:
+                              type: integer
+                            week_52_low:
+                              type: integer
+                            revenue_growth_yoy:
+                              type: number
+                            pat_growth_yoy:
+                              type: number
+                            free_cash_flow:
+                              type: number
+                            fundamental_updated_at:
+                              type: string
+                            tags:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                            - segment
+                            - instrument_token
+                            - tradingsymbol
+                            - exchange_token
+                            - isin
+                            - name
+                            - timestamp
+                            - last_trade_time
+                            - last_price
+                            - buy_quantity
+                            - sell_quantity
+                            - volume
+                            - change
+                            - change_percent
+                            - open
+                            - high
+                            - low
+                            - close
+                            - lower_circuit_limit
+                            - upper_circuit_limit
+                            - average_price
+                            - trade_value
+                            - sector
+                            - market_cap
+                            - pe
+                            - dividend_yield
+                            - roe
+                            - debt_to_equity
+                            - week_52_high
+                            - week_52_low
+                            - revenue_growth_yoy
+                            - pat_growth_yoy
+                            - free_cash_flow
+                            - fundamental_updated_at
+                            - tags
+                    required:
+                      - count
+                      - limit
+                      - offset
+                      - results
+                required:
+                  - status
+                  - data
+  /api/login:
+    post:
+      summary: post_api_login
+      description: Captured API Endpoint for kite.
+      operationId: post_api_login
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      user_id:
+                        type: string
+                      request_id:
+                        type: string
+                      twofa_type:
+                        type: string
+                      twofa_types:
+                        type: array
+                        items:
+                          type: string
+                      twofa_status:
+                        type: string
+                      profile:
+                        type: object
+                        properties:
+                          user_name:
+                            type: string
+                          user_shortname:
+                            type: string
+                          avatar_url:
+                            type: 'null'
+                        required:
+                          - user_name
+                          - user_shortname
+                          - avatar_url
+                    required:
+                      - user_id
+                      - request_id
+                      - twofa_type
+                      - twofa_types
+                      - twofa_status
+                      - profile
+                required:
+                  - status
+                  - data
+  /api/twofa:
+    post:
+      summary: post_api_twofa
+      description: Captured API Endpoint for kite.
+      operationId: post_api_twofa
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  /oms/margins/orders:
+    post:
+      summary: post_oms_margins_orders
+      description: Captured API Endpoint for kite.
+      operationId: post_oms_margins_orders
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  exchange:
+                    type: string
+                  tradingsymbol:
+                    type: string
+                  transaction_type:
+                    type: string
+                  variety:
+                    type: string
+                  product:
+                    type: string
+                  order_type:
+                    type: string
+                  quantity:
+                    type: integer
+                  price:
+                    type: integer
+                required:
+                  - exchange
+                  - tradingsymbol
+                  - transaction_type
+                  - variety
+                  - product
+                  - order_type
+                  - quantity
+                  - price
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        tradingsymbol:
+                          type: string
+                        exchange:
+                          type: string
+                        span:
+                          type: integer
+                        exposure:
+                          type: integer
+                        option_premium:
+                          type: integer
+                        additional:
+                          type: integer
+                        bo:
+                          type: integer
+                        cash:
+                          type: integer
+                        var:
+                          type: integer
+                        mtf:
+                          type: integer
+                        pnl:
+                          type: object
+                          properties:
+                            realised:
+                              type: integer
+                            unrealised:
+                              type: integer
+                          required:
+                            - realised
+                            - unrealised
+                        leverage:
+                          type: integer
+                        charges:
+                          type: object
+                          properties:
+                            transaction_tax:
+                              type: number
+                            transaction_tax_type:
+                              type: string
+                            exchange_turnover_charge:
+                              type: number
+                            sebi_turnover_charge:
+                              type: number
+                            brokerage:
+                              type: number
+                            stamp_duty:
+                              type: integer
+                            gst:
+                              type: object
+                              properties:
+                                igst:
+                                  type: number
+                                cgst:
+                                  type: integer
+                                sgst:
+                                  type: integer
+                                total:
+                                  type: number
+                              required:
+                                - igst
+                                - cgst
+                                - sgst
+                                - total
+                            total:
+                              type: number
+                          required:
+                            - transaction_tax
+                            - transaction_tax_type
+                            - exchange_turnover_charge
+                            - sebi_turnover_charge
+                            - brokerage
+                            - stamp_duty
+                            - gst
+                            - total
+                        total:
+                          type: integer
+                      required:
+                        - type
+                        - tradingsymbol
+                        - exchange
+                        - span
+                        - exposure
+                        - option_premium
+                        - additional
+                        - bo
+                        - cash
+                        - var
+                        - mtf
+                        - pnl
+                        - leverage
+                        - charges
+                        - total
+                required:
+                  - status
+                  - data
+  /oms/nudge/orders:
+    post:
+      summary: post_oms_nudge_orders
+      description: Captured API Endpoint for kite.
+      operationId: post_oms_nudge_orders
+      parameters:
+        - name: x-kite-version
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-platform
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: referer
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-app-uuid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: sec-ch-ua-mobile
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: x-kite-userid
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: user-agent
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: accept
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+        - name: content-type
+          in: header
+          required: true
+          schema:
+            type: string
+            default: required
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  exchange:
+                    type: string
+                  tradingsymbol:
+                    type: string
+                  transaction_type:
+                    type: string
+                  variety:
+                    type: string
+                  product:
+                    type: string
+                  order_type:
+                    type: string
+                  quantity:
+                    type: integer
+                  price:
+                    type: integer
+                  context:
+                    type: string
+                required:
+                  - exchange
+                  - tradingsymbol
+                  - transaction_type
+                  - variety
+                  - product
+                  - order_type
+                  - quantity
+                  - price
+                  - context
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          message:
+                            type: string
+                          description:
+                            type: string
+                          severity:
+                            type: string
+                          prompt:
+                            type: boolean
+                        required:
+                          - type
+                          - message
+                          - description
+                          - severity
+                          - prompt
+                required:
+                  - status
+                  - data
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-polygate-app-key: kite
+x-polygate-display-name: KITE Captured Application
+x-polygate-auth-type: NONE
+x-polygate-status: ACTIVE
+x-polygate-login-url: https://kite.zerodha.com
+x-polygate-login-success-url-pattern: dashboard|portfolio
+x-polygate-login-success-cookie-name: kf_session|enctoken
+x-polygate-session-capture-headers: authorization,x-kite-*

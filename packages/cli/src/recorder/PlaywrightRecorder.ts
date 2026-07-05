@@ -9,6 +9,7 @@ import { SqlGeneratorFactory } from "@/recorder/SqlGeneratorFactory.js";
 import { WebsocketDefinition, AssetDefinition } from "@/recorder/SqlDialectGenerator.js";
 import { Validator } from "@/recorder/Validator.js";
 import { SeedToSqlConverter } from "@/recorder/SeedToSqlConverter.js";
+import { OpenApiSpecGenerator } from "@/recorder/OpenApiSpecGenerator.js";
 
 /**
  * Main orchestrator for Playwright-based traffic recording and code generation.
@@ -350,7 +351,32 @@ export class PlaywrightRecorder {
     }
     console.log(`Saved ${this.websockets.size} WebSocket YAMLs to ${websocketsDir}`);
 
-    // 4. Generate SQL DML files for each supported dialect
+    // 4. Generate OpenAPI Spec YAML
+    const specsDir = path.join(seedDir, "specs");
+    fs.mkdirSync(specsDir, { recursive: true });
+    const specPath = path.join(specsDir, `${this.appKey}-openapi.yaml`);
+
+    const appConfig: Application = this.getExistingAppConfig() || {
+      appKey: this.appKey,
+      displayName: `${this.appKey.toUpperCase()} Captured Application`,
+      baseUrl: this.initialUrl,
+      authType: "NONE",
+      status: "ACTIVE"
+    };
+
+    const openApiDoc = OpenApiSpecGenerator.generate(appConfig, Array.from(this.endpoints.values()));
+    fs.writeFileSync(specPath, yaml.dump(openApiDoc), "utf8");
+    console.log(`Saved OpenAPI Spec YAML to ${specPath}`);
+
+    // Validate OpenAPI Spec YAML
+    const oasValidation = Validator.validateOpenApi(specPath);
+    if (!oasValidation.isValid) {
+      console.error(`[VALIDATION WARN] OpenAPI Spec is structurally invalid:`, oasValidation.errors);
+    } else {
+      console.log(`[VALIDATION OK] OpenAPI Spec is structurally valid: ${path.basename(specPath)}`);
+    }
+
+    // 5. Generate SQL DML files for each supported dialect from the OpenAPI spec
     const dialects = SqlGeneratorFactory.getSupportedDialects();
     for (const dialect of dialects) {
       const sqlFilePath = await SeedToSqlConverter.convertAndSave(this.appKey, dialect, seedDir);

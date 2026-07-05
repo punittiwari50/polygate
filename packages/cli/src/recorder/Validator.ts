@@ -96,4 +96,46 @@ export class Validator {
       errors
     };
   }
+
+  /**
+   * Validates if a file is a structurally valid OpenAPI Spec.
+   */
+  public static validateOpenApi(filePath: string): ValidationResult {
+    const errors: string[] = [];
+    try {
+      if (!fs.existsSync(filePath)) {
+        errors.push(`File does not exist: ${filePath}`);
+        return { isValid: false, errors };
+      }
+
+      const content = fs.readFileSync(filePath, "utf8");
+      const doc = yaml.load(content) as any;
+
+      if (!doc) {
+        errors.push("OpenAPI Spec is empty or not well-formed YAML");
+        return { isValid: false, errors };
+      }
+
+      if (!doc.openapi) {
+        errors.push("Missing required 'openapi' version field");
+      }
+      if (!doc.info || !doc.info.title || !doc.info.version) {
+        errors.push("Missing required 'info' fields (title, version)");
+      }
+      if (!doc.paths || typeof doc.paths !== "object") {
+        errors.push("Missing required 'paths' object");
+      }
+      if (!doc["x-polygate-app-key"]) {
+        errors.push("Missing required custom extension 'x-polygate-app-key'");
+      }
+
+    } catch (err: any) {
+      errors.push(`OpenAPI Validation Syntax Error: ${err.message}`);
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
 }
